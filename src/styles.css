@@ -130,7 +130,7 @@ button:active {
   flex-direction: column;
   background: var(--base);
   border-radius: 24px 24px 0 0;
-  overflow: hidden;
+  overflow: clip;
 }
 .race-sheet:before {
   content: "";
@@ -439,7 +439,7 @@ h1 {
   padding: 12px 12px 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: clip;
 }
 .tabs {
   display: flex;
@@ -483,7 +483,7 @@ h1 {
 }
 .section-heading {
   height: 36px;
-  padding-top: 14px;
+  padding-top: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -896,3 +896,87 @@ h1 {
     transform: none;
   }
 }
+.terms-dialog[open] { animation: terms-in 520ms cubic-bezier(.22, 1, .36, 1) both; }
+.terms-dialog[open]::backdrop { animation: terms-scrim-in 420ms ease-out both; }
+.terms-dialog[open].is-closing { animation: terms-out 300ms cubic-bezier(.4, 0, .8, .4) both; }
+.terms-dialog[open].is-closing::backdrop { animation: terms-scrim-out 300ms ease-in both; }
+@keyframes terms-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes terms-out { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes terms-scrim-in { from { background: rgba(0,0,0,0); } to { background: rgba(0,0,0,.64); } }
+@keyframes terms-scrim-out { from { background: rgba(0,0,0,.64); } to { background: rgba(0,0,0,0); } }
+@media (prefers-reduced-motion: reduce) {
+  .terms-dialog[open], .terms-dialog[open]::backdrop { animation: none; }
+}
+/* Numerals have separate fixed cells and independent incoming/outgoing layers. */
+.participants .stat-value > strong { top: -5px; height: 20px; text-box-trim: none; }
+.stat-value > strong > .rolling-number {
+  display: inline-flex; height: 20px; line-height: 20px; text-box-trim: none;
+  font-variant-numeric: tabular-nums; letter-spacing: 0;
+}
+.rolling-slot { position: relative; flex: 0 0 .82em; width: .82em; height: 20px; overflow: hidden; }
+.rolling-separator { flex-basis: .38em; width: .38em; }
+.rolling-pair { position: absolute; inset: 0; text-box-trim: none; }
+.rolling-static, .rolling-old, .rolling-new {
+  position: absolute; inset: 0; height: 20px; line-height: 20px;
+  text-align: center; text-box-trim: none;
+}
+.rolling-static { transform: translateY(-2px); }
+.rolling-old { animation: participant-old 720ms cubic-bezier(.22, 1, .36, 1) both; }
+.rolling-new { animation: participant-new 720ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes participant-old {
+  from { transform: translateY(-2px); opacity: 1; }
+  to { transform: translateY(-22px); opacity: 0; }
+}
+@keyframes participant-new {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: translateY(-2px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rolling-old { animation: none; visibility: hidden; }
+  .rolling-new { animation: none; transform: translateY(-2px); }
+}
+.games-heading { height: 36px; padding-top: 12px; }
+.games-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.game-card { position: relative; aspect-ratio: 3 / 4; min-width: 0; }
+.game-artwork { position: absolute; inset: 0; background: var(--surface); border-radius: 12px; overflow: hidden; transition: transform 220ms cubic-bezier(.22, 1, .36, 1); }
+.game-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.game-badge { position: absolute; top: 8px; left: 8px; padding: 0 4px; border-radius: 4px; background: #ff3b47; font-size: 11px; line-height: 16px; }
+.game-favorite { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: 50%; background: #0e121bb3; }
+.game-favorite[aria-pressed="true"] { background: var(--pink); }
+@media (hover: hover) { .game-card:hover .game-artwork { transform: scale(1.03); } }
+@media (prefers-reduced-motion: reduce) { .game-artwork { transition: none; } }
+.games-heading h2 { margin-left: 0; transform: none; }
+.game-badge { border-radius: 999px; }
+
+.participants-icon {
+  flex-shrink: 0;
+  align-self: center;
+  transform: scaleX(-1);
+}
+.section-heading { align-items: flex-start; }
+
+/* A fixed 12px gap separates the controls from the scrolling content. */
+.tabs { position: relative; z-index: 4; margin-bottom: 12px; }
+.section-heading, .games-heading { height: 24px; padding-top: 0; }
+.race-panel::after {
+  content: ""; position: absolute; top: 60px; left: 0; right: 0; height: 24px;
+  z-index: 2; background: var(--base); pointer-events: none;
+  mask-image: url("/assets/imgRectangle407901925.svg");
+  mask-size: 100% 100%; mask-repeat: no-repeat; transform: scaleY(-1);
+  opacity: 0; transition: opacity 160ms ease-out;
+}
+.race-panel[data-scrolled="true"]::after { opacity: 1; }/* Keep the grid aligned while reserving room for the 3% hover enlargement. */
+.tab-content { margin-inline: -4px; padding-inline: 4px; }
+.game-card:hover { z-index: 1; }
+.join-button { display: grid; place-items: center; }
+.join-button:disabled { opacity: 1; filter: none; }
+.join-spinner { display: block; width: 20px; height: 20px; border: 2px solid #ffffff55; border-top-color: #fff; border-radius: 50%; animation: join-spin 750ms linear infinite; }
+@keyframes join-spin { to { transform: rotate(360deg); } }
+.my-place { position: relative; width: 100%; height: 56px; background: #342c3f; border: 1px solid #ffffff24; box-shadow: 0 8px 24px #0005; animation: my-place-in 400ms cubic-bezier(.22,1,.36,1) both; }
+.my-place .rank { width: 38px; color: white; }
+.my-place .player-details > span:first-child { font-weight: 600; color: white; }
+.my-place-you { padding: 4px 8px; background: #fe076026; border-radius: 8px; color: #ff78a5; font-size: 12px; font-weight: 600; }
+.race-panel[data-joined="true"] .tab-content { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+.race-panel[data-joined="true"] .join-area::before { height: calc(88px + env(safe-area-inset-bottom, 0px)); }
+@keyframes my-place-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .my-place { animation: none; } .join-spinner { animation-duration: 1500ms; } }

@@ -18,11 +18,18 @@ const playerEntries = [
   { id: "3729856", bets: "$17,320" },
   { id: "8241503", bets: "$14,975" },
 ];
-const players = playerEntries.map((player, index) => ({
+const leaderboardEntries = [
+  ...playerEntries,
+  ...Array.from({ length: 20 }, (_, index) => ({
+    id: String(3100000 + index * 173921),
+    bets: `$${(14000 - index * 650).toLocaleString('en-US')}`,
+  })),
+];
+const players = leaderboardEntries.map((player, index) => ({
   rank: index + 1,
   name: `Id ${player.id}`,
   detail: player.bets,
-  prize: prizes[index],
+  prize: prizes[index] ?? null,
   avatar:
     index === 0
       ? "imgImage20260415T1918587302.png"
@@ -66,6 +73,27 @@ function TermsSection({ title, items }: {
   );
 }
 
+function RollingParticipants({ value, previous }: { value: number; previous: number }) {
+  const current = value.toLocaleString('en-US');
+  const old = previous.toLocaleString('en-US').padStart(current.length, ' ');
+  return (
+    <span className="rolling-number" aria-label={current}>
+      {Array.from(current).map((digit, index) => {
+        const changed = digit !== old[index];
+        return (
+          <span className={`rolling-slot ${digit === ',' ? 'rolling-separator' : ''}`} key={current.length - index} aria-hidden="true">
+            {changed ? (
+              <span className="rolling-pair" key={`${value}-${index}`}>
+                <span className="rolling-old">{old[index]}</span>
+                <span className="rolling-new">{digit}</span>
+              </span>
+            ) : <span className="rolling-static">{digit}</span>}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
 function Countdown() {
   const [deadline] = useState(
     () => Date.now() + (29 * 86400 + 23 * 3600 + 56 * 60 + 57) * 1000,
@@ -195,8 +223,69 @@ function Leaderboard() {
   );
 }
 
+const games = [
+  { title: 'Lawn n Complete Disorder', images: [0], isNew: true },
+  { title: 'Sweet Bonanza 1000 Dice', images: [1], isNew: true },
+  { title: 'Nugget Ridge', images: [2] },
+  { title: 'Mystery Fruit Tap-a-Roo', images: [3] },
+  { title: 'Magic Fruits Deluxe', images: [4] },
+  { title: '3 African Drums', images: [5] },
+  { title: 'Fury of Anubis', images: [6] },
+  { title: 'Infernal Trinity Go Guaranteed', images: [7] },
+  { title: 'Ra vs Osiris', images: [8, 9] },
+  { title: 'Nice Catch 2 Doublemax', images: [10] },
+  { title: 'Area Link Wolf', images: [11] },
+  { title: 'Sugar Rush 1000', images: [12] },
+  { title: 'Chicken Road 2.0', images: [13] },
+  { title: 'Lawn n Complete Disorder', images: [0] },
+  { title: 'Sweet Bonanza 1000 Dice', images: [1] },
+];
+
+function Games() {
+  const [favorites, setFavorites] = useState<Set<number>>(() => new Set());
+  return (
+    <>
+      <div className="section-heading games-heading"><h2>Players</h2></div>
+      <div className="games-grid">
+        {games.map((game, index) => (
+          <article className="game-card" key={index} aria-label={game.title}>
+            <div className="game-artwork">
+              {game.images.map((image) => <img className="game-cover" key={image} src={asset(`game-${image}.png`)} alt="" />)}
+              {game.isNew && <span className="game-badge">New</span>}
+              <button className="game-favorite" aria-label={`Favorite ${game.title}`} aria-pressed={favorites.has(index)} onClick={() => {
+                setFavorites((current) => {
+                  const next = new Set(current);
+                  if (next.has(index)) next.delete(index); else next.add(index);
+                  return next;
+                });
+              }}><Icon name="game-heart.svg" /></button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </>
+  );
+}
 function App() {
+  const [participantCount, setParticipantCount] = useState({ value: race.participants, previous: race.participants });
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      const increment = Math.floor(Math.random() * 50) + 1;
+      setParticipantCount(({ value }) => ({ previous: value, value: value + increment >= 10_000 ? 6_000 : value + increment }));
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const [participation, setParticipation] = useState<'idle' | 'loading' | 'joined'>('idle');
+  const joinTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (joinTimer.current !== null) window.clearTimeout(joinTimer.current); }, []);
+  function joinRace() {
+    if (participation !== 'idle') return;
+    setParticipation('loading');
+    joinTimer.current = window.setTimeout(() => { setParticipation('joined'); joinTimer.current = null; }, 3000);
+  }
+  const [hasScrolled, setHasScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("Leaderboard");
+  useEffect(() => setHasScrolled(false), [activeTab]);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isOpen, setIsOpen] = useState(true);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -261,8 +350,15 @@ function App() {
     setActiveTab(tabs[next]);
     tabButtons.current[next]?.focus();
   }
+  function closeTerms() {
+    const target = termsDialog.current;
+    if (!target?.open || target.classList.contains('is-closing')) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) target.close();
+    else target.classList.add('is-closing');
+  }
   function showDialog(kind: 'participation' | 'terms') {
     const target = kind === 'terms' ? termsDialog.current : dialog.current;
+    target?.classList.remove('is-closing');
     target?.showModal();
     if (kind === 'terms') target?.querySelector('.terms-content')?.scrollTo(0, 0);
   }
@@ -313,13 +409,15 @@ function App() {
             <Icon name="imgLine158.svg" className="stats-divider" />
             <div className="stat-card participants">
               <span>Participants</span>
-              <div className="stat-value"><strong><span>{race.participants.toLocaleString("en-US")}</span><Icon name="imgUser.svg" className="participants-icon" /></strong></div>
+              <div className="stat-value"><strong><RollingParticipants value={participantCount.value} previous={participantCount.previous} /><Icon name="imgUser.svg" className="participants-icon" /></strong></div>
             </div>
           </div>
           <button className="terms-link" onClick={() => showDialog('terms')}>Terms of participation<span className="info-icon"><Icon name="imgCircleInfo.svg" /></span></button>
         </section>
         <section
           className="race-panel"
+          data-scrolled={hasScrolled}
+          data-joined={participation === 'joined'}
           id="race-panel"
           aria-label="Race details"
         >
@@ -344,36 +442,31 @@ function App() {
           </div>
           <div
             className="tab-content"
+            key={activeTab}
+            onScroll={(event) => setHasScrolled(event.currentTarget.scrollTop > 0)}
             role="tabpanel"
             id={`panel-${tabId(activeTab)}`}
             aria-labelledby={`tab-${tabId(activeTab)}`}
             tabIndex={0}
           >
             {activeTab === "Leaderboard" && <Leaderboard />}
-            {activeTab === "Events & Games" && (
-              <div className="info-panel">
-                <h2>Events &amp; Games</h2>
-                <p>
-                  Participating events and games will appear here when the race is
-                  connected to the casino.
-                </p>
-                <button
-                  className="secondary-button"
-                  onClick={() => setActiveTab("Leaderboard")}
-                >
-                  View leaderboard
-                </button>
-              </div>
-            )}
+            {activeTab === "Events & Games" && <Games />}
           </div>
-          <div className="join-area">
-            <button
-              className="primary-button"
-              lang="ru"
-              onClick={() => showDialog('participation')}
-            >
-              Участвовать
-            </button>
+          <div className="join-area" aria-live="polite">
+            {participation === 'joined' ? (
+              <div className="my-place player-row" role="status" aria-label="Ваше место: 31">
+                <span className="rank">#31</span>
+                <div className="player">
+                  <div className="avatar"><img src={asset('avatar-beer-216.png')} alt="" /></div>
+                  <div className="player-details"><span>Ваше место</span><span>$1,350 · Total bets</span></div>
+                </div>
+                <span className="my-place-you">Вы</span>
+              </div>
+            ) : (
+              <button className="primary-button join-button" lang="ru" onClick={joinRace} disabled={participation === 'loading'} aria-busy={participation === 'loading'} aria-label={participation === 'loading' ? 'Присоединяемся к гонке' : 'Участвовать'}>
+                {participation === 'loading' ? <span className="join-spinner" aria-hidden="true" /> : 'Участвовать'}
+              </button>
+            )}
           </div>
         </section>
       </div>
@@ -399,10 +492,17 @@ function App() {
         className="terms-dialog"
         aria-labelledby="terms-title"
         aria-describedby="terms-subtitle"
+        onCancel={(event) => { event.preventDefault(); closeTerms(); }}
+        onAnimationEnd={(event) => {
+          if (event.target === event.currentTarget && event.animationName === 'terms-out') {
+            event.currentTarget.close();
+            event.currentTarget.classList.remove('is-closing');
+          }
+        }}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
             const bounds = event.currentTarget.getBoundingClientRect();
-            if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) termsDialog.current?.close();
+            if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closeTerms();
           }
         }}
       >
@@ -412,7 +512,7 @@ function App() {
             <h2 id="terms-title">Lucky Race</h2>
             <p id="terms-subtitle">{race.prizePool.toLocaleString("en-US")} {race.currency} prize pool</p>
           </div>
-          <button className="terms-close" aria-label="Close terms" autoFocus onClick={() => termsDialog.current?.close()}>
+          <button className="terms-close" aria-label="Close terms" autoFocus onClick={() => closeTerms()}>
             <Icon name="imgCrossLarge.svg" />
           </button>
         </header>
@@ -425,7 +525,7 @@ function App() {
           ]} />
           <TermsSection title="Leaderboard" items={[
             { label: "Ranking metric", values: ["Total bets"] },
-            { label: "Participants", values: [race.participants.toLocaleString("en-US")] },
+            { label: "Participants", values: [participantCount.value.toLocaleString("en-US")] },
             { label: "Current leader", values: [players[0].name] },
             { label: "Leading total bets", values: [players[0].detail, "1st place"] },
           ]} />
@@ -433,7 +533,7 @@ function App() {
         <footer className="terms-footer">
           <button onClick={() => {
             setActiveTab("Leaderboard");
-            termsDialog.current?.close();
+            closeTerms();
             requestAnimationFrame(() => tabButtons.current[0]?.focus());
           }}>
             View Lucky Race leaderboard<Icon name="terms-chevron.svg" />

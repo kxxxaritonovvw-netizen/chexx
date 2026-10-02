@@ -4,3 +4,6 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .DS_Store
+
+# Local screenshots used while reviewing the demo
+*-preview.png
