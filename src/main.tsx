@@ -4,11 +4,24 @@ import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import "./styles.css";
 
 const asset = (name: string) => `/assets/${name}`;
+const race = { prizePool: 50_000, participants: 6_092, currency: "USDT" };
 const prizes = ["5,000", "2,000", "1,000", "500", "200", "100", "50", "50", "50", null];
-const players = Array.from({ length: 10 }, (_, index) => ({
+const playerEntries = [
+  { id: "5829473", bets: "$42,875" },
+  { id: "7190362", bets: "$38,640" },
+  { id: "4601285", bets: "$35,210" },
+  { id: "8935741", bets: "$31,985" },
+  { id: "2376109", bets: "$28,450" },
+  { id: "6458920", bets: "$25,730" },
+  { id: "1084637", bets: "$22,165" },
+  { id: "9562074", bets: "$19,840" },
+  { id: "3729856", bets: "$17,320" },
+  { id: "8241503", bets: "$14,975" },
+];
+const players = playerEntries.map((player, index) => ({
   rank: index + 1,
-  name: "Id 5829473",
-  detail: "$42,875",
+  name: `Id ${player.id}`,
+  detail: player.bets,
   prize: prizes[index],
   avatar:
     index === 0
@@ -29,6 +42,28 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
 
 function Usdt() {
   return <span className="usdt-icon" role="img" aria-label="USDT"><Icon name="usdt.svg" /></span>;
+}
+
+function TermsSection({ title, items }: {
+  title: string;
+  items: { label: string; values: string[] }[];
+}) {
+  return (
+    <section className="terms-section" aria-label={title}>
+      <h3>{title}</h3>
+      <dl className="terms-card">
+        {items.map((item, index) => (
+          <div className="terms-item" key={item.label}>
+            {index > 0 && <div className="terms-divider"><Icon name="terms-divider.svg" /></div>}
+            <div className="terms-row">
+              <dt>{item.label}</dt>
+              <dd>{item.values.map((value) => <span key={value}>{value}</span>)}</dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
 }
 
 function Countdown() {
@@ -164,12 +199,21 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>("Leaderboard");
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isOpen, setIsOpen] = useState(true);
-  const [dialogKind, setDialogKind] = useState<'participation' | 'terms'>('participation');
   const dialog = useRef<HTMLDialogElement>(null);
+  const termsDialog = useRef<HTMLDialogElement>(null);
   const hero = useRef<HTMLElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const reopenButton = useRef<HTMLButtonElement>(null);
   const tabButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  useEffect(() => {
+    const element = termsDialog.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() => {
+      if (element.clientWidth > 0) element.style.setProperty("--divider-scale", String((element.clientWidth - 56) / 304));
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     const element = hero.current;
     if (!element) return;
@@ -218,8 +262,9 @@ function App() {
     tabButtons.current[next]?.focus();
   }
   function showDialog(kind: 'participation' | 'terms') {
-    setDialogKind(kind);
-    dialog.current?.showModal();
+    const target = kind === 'terms' ? termsDialog.current : dialog.current;
+    target?.showModal();
+    if (kind === 'terms') target?.querySelector('.terms-content')?.scrollTo(0, 0);
   }
   return (
     <main className="phone" aria-label="Lucky Race">
@@ -263,12 +308,12 @@ function App() {
           <div className="race-stats" aria-label="Race prizes and participants">
             <div className="stat-card prize-pool">
               <span>Prize pool</span>
-              <div className="stat-value"><strong><span>50 000</span><Usdt /></strong></div>
+              <div className="stat-value"><strong><span>{race.prizePool.toLocaleString("en-US").replace(/,/g, " ")}</span><Usdt /></strong></div>
             </div>
             <Icon name="imgLine158.svg" className="stats-divider" />
             <div className="stat-card participants">
               <span>Participants</span>
-              <div className="stat-value"><strong><span>6,092</span><Icon name="imgUser.svg" className="participants-icon" /></strong></div>
+              <div className="stat-value"><strong><span>{race.participants.toLocaleString("en-US")}</span><Icon name="imgUser.svg" className="participants-icon" /></strong></div>
             </div>
           </div>
           <button className="terms-link" onClick={() => showDialog('terms')}>Terms of participation<span className="info-icon"><Icon name="imgCircleInfo.svg" /></span></button>
@@ -340,17 +385,60 @@ function App() {
           if (e.target === e.currentTarget) dialog.current?.close();
         }}
       >
-        <h2 id="race-dialog-title">{dialogKind === 'terms' ? 'Terms of participation' : 'Lucky race'}</h2>
-        {dialogKind === 'terms' ? <>
-          <p>Prize pool: 50 000 USDT. Participants: 6,092.</p>
-          <p>Full participation rules have not been supplied for this preview.</p>
-        </> : <p>
+        <h2 id="race-dialog-title">Lucky race</h2>
+        <p>
           This is a design preview. Joining the race requires a connected CHEXXY
           account and the participation rules.
-        </p>}
+        </p>
         <form method="dialog">
           <button className="primary-button">Got it</button>
         </form>
+      </dialog>
+      <dialog
+        ref={termsDialog}
+        className="terms-dialog"
+        aria-labelledby="terms-title"
+        aria-describedby="terms-subtitle"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            const bounds = event.currentTarget.getBoundingClientRect();
+            if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) termsDialog.current?.close();
+          }
+        }}
+      >
+        <div className="terms-handle-area"><div className="drag-handle" aria-hidden="true" /></div>
+        <header className="terms-header">
+          <div>
+            <h2 id="terms-title">Lucky Race</h2>
+            <p id="terms-subtitle">{race.prizePool.toLocaleString("en-US")} {race.currency} prize pool</p>
+          </div>
+          <button className="terms-close" aria-label="Close terms" autoFocus onClick={() => termsDialog.current?.close()}>
+            <Icon name="imgCrossLarge.svg" />
+          </button>
+        </header>
+        <div className="terms-content">
+          <TermsSection title="Parameters" items={[
+            { label: "Prize pool", values: [`${race.prizePool.toLocaleString("en-US")} ${race.currency}`] },
+            { label: "Top prize", values: [`${players[0].prize} ${race.currency}`] },
+            { label: "Reward currency", values: [race.currency] },
+            { label: "Top 3 rewards", values: players.slice(0, 3).map((player) => `#${player.rank} · ${player.prize} ${race.currency}`) },
+          ]} />
+          <TermsSection title="Leaderboard" items={[
+            { label: "Ranking metric", values: ["Total bets"] },
+            { label: "Participants", values: [race.participants.toLocaleString("en-US")] },
+            { label: "Current leader", values: [players[0].name] },
+            { label: "Leading total bets", values: [players[0].detail, "1st place"] },
+          ]} />
+        </div>
+        <footer className="terms-footer">
+          <button onClick={() => {
+            setActiveTab("Leaderboard");
+            termsDialog.current?.close();
+            requestAnimationFrame(() => tabButtons.current[0]?.focus());
+          }}>
+            View Lucky Race leaderboard<Icon name="terms-chevron.svg" />
+          </button>
+        </footer>
       </dialog>
     </main>
   );

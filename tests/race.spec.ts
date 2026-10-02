@@ -11,7 +11,7 @@ test("matches the screen dimensions and loads every visible asset", async ({
   await expect(page.locator(".prize-pool")).toContainText("50 000");
   await expect(page.locator(".participants")).toContainText("6,092");
   await expect(page.getByRole("heading", { name: "Lucky race" })).toBeVisible();
-  const images = await page.locator("img").evaluateAll((images) =>
+  const images = await page.locator("img:visible").evaluateAll((images) =>
     images.map((img) => ({
       src: img.getAttribute("src"),
       loaded: img.complete && img.naturalWidth > 0,
@@ -47,9 +47,51 @@ test("tabs and terms support clicks and keyboard navigation", async ({ page }) =
   await expect(page.getByRole("tab", { name: "Events & Games", exact: true })).toHaveAttribute("aria-selected", "true");
   const terms = page.getByRole("button", { name: "Terms of participation" });
   await terms.click();
-  await expect(page.getByRole("dialog")).toContainText("Full participation rules");
+  await expect(page.getByRole("dialog")).toContainText("50,000 USDT");
   await page.keyboard.press("Escape");
   await expect(terms).toBeFocused();
+});
+
+test("terms sheet matches the Figma geometry and current race data", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const ids = await page.locator(".player-details > span:first-child").allTextContents();
+  expect(new Set(ids).size).toBe(10);
+  const terms = page.getByRole("button", { name: "Terms of participation" });
+  await terms.click();
+  const sheet = page.getByRole("dialog");
+  await expect(sheet).toBeVisible();
+  expect(await sheet.boundingBox()).toEqual({ x: 0, y: 342, width: 360, height: 576 });
+  await expect(sheet.locator(".terms-row")).toHaveCount(8);
+  await expect(sheet).toContainText("5,000 USDT");
+  await expect(sheet).toContainText("6,092");
+  await expect(sheet).toContainText(ids[0]);
+  await expect(sheet).toContainText("$42,875");
+  await expect(sheet.locator("img")).toHaveCount(8);
+  expect(await sheet.locator("img").evaluateAll((images) => images.every((image) => image.complete && image.naturalWidth > 0))).toBe(true);
+  await sheet.screenshot({ path: "test-results/lucky-race-terms-360.png" });
+  await page.getByRole("button", { name: "Close terms" }).click();
+  await expect(sheet).not.toBeVisible();
+  await expect(terms).toBeFocused();
+  await terms.click();
+  await page.getByRole("button", { name: "View Lucky Race leaderboard" }).click();
+  await expect(sheet).not.toBeVisible();
+  await expect(page.getByRole("tab", { name: "Leaderboard" })).toBeFocused();
+  for (const [width, height] of [[320, 568], [430, 932]]) {
+    await page.setViewportSize({ width, height });
+    await terms.click();
+    const bounds = (await sheet.boundingBox())!;
+    expect(bounds.width).toBe(width);
+    expect(bounds.y + bounds.height).toBe(height);
+    expect(bounds.y).toBeGreaterThanOrEqual(12);
+    expect(await sheet.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    if (width === 320) {
+      expect(await sheet.locator(".terms-content").evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+      await sheet.screenshot({ path: "test-results/lucky-race-terms-320.png" });
+    }
+    await page.keyboard.press("Escape");
+    await expect(terms).toBeFocused();
+  }
 });
 
 test("participation dialog opens and restores focus on escape", async ({

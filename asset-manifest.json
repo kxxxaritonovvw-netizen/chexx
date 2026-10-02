@@ -120,5 +120,13 @@
     "file": "avatar-beer-216.png",
     "derivedFrom": "imgImage1926988518.png",
     "note": "216px display asset to prevent aliasing when the 909px export is rendered at 54px; original preserved."
+  },
+  {
+    "name": "imgDividerLine",
+    "file": "terms-divider.svg"
+  },
+  {
+    "name": "imgChevronRight",
+    "file": "terms-chevron.svg"
   }
 ]
