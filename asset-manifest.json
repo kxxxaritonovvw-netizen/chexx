@@ -1,0 +1,124 @@
+[
+  {
+    "name": "imgColorColorfull",
+    "file": "usdt.svg"
+  },
+  {
+    "name": "imgEditImage1WhilePreservingTheOriginalTamagotchiCharacterItsExactShapeProportionsFacialOclnv0Mknqmld10Dhqta2",
+    "file": "hero-rays.png"
+  },
+  {
+    "name": "img4A7D48B740F34252868E524F9943E0C32",
+    "file": "pig-mask.png"
+  },
+  {
+    "name": "img4A7D48B740F34252868E524F9943E0C33",
+    "file": "pig-body.png"
+  },
+  {
+    "name": "imgImage20260415T1918587302",
+    "file": "imgImage20260415T1918587302.png"
+  },
+  {
+    "name": "imgImage20260415T1933163651",
+    "file": "imgImage20260415T1933163651.png"
+  },
+  {
+    "name": "imgImage1926988518",
+    "file": "imgImage1926988518.png"
+  },
+  {
+    "name": "imgEditImage1WhilePreservingTheOriginalTamagotchiCharacterItsExactShapeProportionsFacialOclnv0Mknqmld10Dhqta01",
+    "file": "hero-rays-mask.svg"
+  },
+  {
+    "name": "imgCrossLarge",
+    "file": "imgCrossLarge.svg"
+  },
+  {
+    "name": "imgGroup2147239552",
+    "file": "imgGroup2147239552.svg"
+  },
+  {
+    "name": "imgGroup2147239554",
+    "file": "imgGroup2147239554.svg"
+  },
+  {
+    "name": "imgEllipse3",
+    "file": "imgEllipse3.svg"
+  },
+  {
+    "name": "imgEllipse4",
+    "file": "imgEllipse4.svg"
+  },
+  {
+    "name": "imgEllipse5",
+    "file": "imgEllipse5.svg"
+  },
+  {
+    "name": "imgEllipse6",
+    "file": "imgEllipse6.svg"
+  },
+  {
+    "name": "imgVector234265420",
+    "file": "imgVector234265420.svg"
+  },
+  {
+    "name": "imgVector234265419",
+    "file": "imgVector234265419.svg"
+  },
+  {
+    "name": "imgCircleInfo",
+    "file": "imgCircleInfo.svg"
+  },
+  {
+    "name": "imgGroup2136140484",
+    "file": "imgGroup2136140484.svg"
+  },
+  {
+    "name": "imgGroup2136140485",
+    "file": "imgGroup2136140485.svg"
+  },
+  {
+    "name": "imgGroup2136140486",
+    "file": "imgGroup2136140486.svg"
+  },
+  {
+    "name": "imgGroup2136140487",
+    "file": "imgGroup2136140487.svg"
+  },
+  {
+    "name": "imgLine158",
+    "file": "imgLine158.svg"
+  },
+  {
+    "name": "imgUser",
+    "file": "imgUser.svg"
+  },
+  {
+    "name": "imgRectangle2087336626",
+    "file": "imgRectangle2087336626.svg"
+  },
+  {
+    "name": "imgFrame",
+    "file": "imgFrame.svg"
+  },
+  {
+    "name": "imgDots",
+    "file": "imgDots.svg"
+  },
+  {
+    "name": "imgGroup2087327803",
+    "file": "imgGroup2087327803.svg"
+  },
+  {
+    "name": "imgRectangle407901925",
+    "file": "imgRectangle407901925.svg"
+  },
+  {
+    "name": "avatar-beer-216",
+    "file": "avatar-beer-216.png",
+    "derivedFrom": "imgImage1926988518.png",
+    "note": "216px display asset to prevent aliasing when the 909px export is rendered at 54px; original preserved."
+  }
+]
