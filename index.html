@@ -118,6 +118,7 @@
     transition: transform .08s, opacity .2s;
   }
   .hit-btn:active { transform: scale(.96); }
+  .hit-btn.idle { opacity: .55; box-shadow: none; } /* nothing to claim yet, still tappable */
   .hit-btn:disabled { background: rgba(255,255,255,.1); box-shadow: none; color: var(--muted); font-size: 12px; font-family: var(--font); font-weight: 600; text-transform: none; letter-spacing: 0; cursor: default; }
 
   /* ---------- Bottom nav ---------- */
@@ -318,8 +319,7 @@
     $('today').textContent = `${fmtInt(state.today)} USDT`;
     const btn = $('hitBtn');
     if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Пул пуст'; }
-    else if (state.available < 0.01) { btn.disabled = true; btn.textContent = 'Сделай ставку'; }
-    else { btn.disabled = false; btn.textContent = 'Выбить'; }
+    else { btn.disabled = false; btn.textContent = 'Выбить'; btn.classList.toggle('idle', state.available < 0.01); }
     const pct = Math.max(0, state.pool / POOL_TOTAL * 100);
     $('poolBar').style.width = pct + '%';
     $('poolPct').textContent = `осталось ${pct >= 10 ? pct.toFixed(1) : pct.toFixed(2)}%`;
