@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Penyatta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #110c18;
+    --stage: #410f6d;
+    --pill-from: #6a22b8;
+    --pill-to: #9b3cff;
+    --accent: #8b1ffe;
+    --hot: #ff2d87;
+    --green: #2fd27a;
+    --text: #ffffff;
+    --muted: rgba(255,255,255,.62);
+    --nav: #110c18;
+    --font-wide: "Unbounded", system-ui, sans-serif;
+    --font: "Inter", -apple-system, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #07050a; color: var(--text); font-family: var(--font); overflow: hidden; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
+
+  .app {
+    position: relative; margin: 0 auto; max-width: 430px; height: 100dvh;
+    display: flex; flex-direction: column; background: var(--stage); overflow: clip;
+    user-select: none; -webkit-user-select: none;
+  }
+
+  /* ---------- Header ---------- */
+  .header {
+    background: var(--bg-dark); padding: calc(env(safe-area-inset-top) + 10px) 16px 12px;
+    display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; z-index: 5;
+  }
+  .header .icon-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; }
+  .header .icon-btn:active { background: rgba(255,255,255,.08); }
+  .title { text-align: center; }
+  .title h1 { margin: 0; font-family: var(--font-wide); font-weight: 800; font-size: 17px; letter-spacing: .06em; }
+  .title .sub { margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.9); }
+  .timer { display: inline-flex; align-items: center; gap: 2px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .timer i { font-style: normal; color: var(--muted); padding: 0 1px; }
+
+  /* ---------- Stage ---------- */
+  .stage { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+
+  .pool {
+    position: relative; z-index: 4; margin-top: 18px; display: flex; align-items: center;
+    height: 50px; padding: 0 18px 0 44px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--pill-from) 0%, var(--accent) 60%, var(--pill-to) 100%);
+    box-shadow: 0 6px 24px rgba(139,31,254,.35);
+    transition: box-shadow .3s;
+  }
+  .pool .coin { position: absolute; left: -16px; top: 50%; width: 48px; transform: translateY(-50%) rotate(-8deg); filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
+  .pool .value { font-size: 40px; font-weight: 500; letter-spacing: -.01em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .pool.low { background: linear-gradient(90deg, #a2245c 0%, #e8336f 60%, #ff5a5a 100%); }
+  .pool .delta {
+    position: absolute; right: 10px; top: -4px; font-size: 13px; font-weight: 700; color: #ff7aa8;
+    pointer-events: none; animation: deltaUp 1.1s ease-out forwards;
+  }
+  @keyframes deltaUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-22px); } }
+  .pool-meta { margin-top: 8px; z-index: 4; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); font-weight: 500; }
+  .bar { width: 120px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.14); overflow: hidden; }
+  .bar > span { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--hot), #ffb84d); border-radius: 4px; transition: width .6s ease; }
+
+  /* Pinata on a rope. The anchor sits just under the pool pill; #swing rotates around it. */
+  .rig { position: absolute; left: 50%; top: 52px; width: 0; height: 0; z-index: 3; }
+  .rope-top {
+    position: absolute; left: -2px; top: 0; width: 4px; height: var(--rope, 34px); border-radius: 2px;
+    background: repeating-linear-gradient(180deg, #ff5fa2 0 6px, #ffd23f 6px 12px, #4fd1c5 12px 18px, #7b8cff 18px 24px);
+  }
+  #swing { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  #swing .rope-top { top: 0; }
+  .pinata-hit {
+    position: absolute; top: calc(var(--rope, 34px) - 4px); /* image rope starts where rope-top ends */
+    width: var(--pw); height: calc(var(--pw) * 1.5538);
+    left: calc(var(--pw) * -0.593);
+    transform-origin: 59.3% 0; transform: rotate(-5deg); /* straighten the baked-in rope */
+    cursor: pointer; touch-action: manipulation;
+  }
+  .pinata-hit img { width: 100%; height: 100%; display: block; pointer-events: none; filter: drop-shadow(0 18px 24px rgba(0,0,0,.35)); transform-origin: 59% 20%; }
+  .pinata-hit img.squash { animation: squash .28s ease-out; }
+  @keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.06, .93); } 60% { transform: scale(.97, 1.04); } 100% { transform: scale(1); } }
+  .pinata-hit.empty img { filter: grayscale(.85) brightness(.7) drop-shadow(0 18px 24px rgba(0,0,0,.35)); }
+
+  .bottom-block { margin-top: auto; width: 100%; padding-bottom: 12px; z-index: 4; }
+  .today { position: relative; z-index: 4; margin-top: 12px; text-align: center; font-weight: 700; font-size: 15px; letter-spacing: .01em; text-transform: uppercase; text-shadow: 0 1px 6px rgba(65,15,109,.9); }
+  .today b { font-family: var(--font-wide); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .ticker { margin-top: 0; height: 20px; overflow: hidden; position: relative; white-space: nowrap; }
+  .ticker-track { position: absolute; left: 0; top: 0; display: flex; gap: 28px; will-change: transform; }
+  .ticker-item { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.92); display: inline-flex; gap: 6px; align-items: center; }
+  .ticker-item em { font-style: normal; color: #ffd23f; }
+  .ticker-item.me { color: var(--green); }
+  .ticker-item.me em { color: var(--green); }
+
+  /* Claim card */
+  .claim {
+    margin: 14px 16px 0; padding: 12px 12px 12px 16px; border-radius: 18px;
+    background: rgba(17,12,24,.55); border: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; gap: 12px; backdrop-filter: blur(8px);
+  }
+  .claim .info { flex: 1; min-width: 0; }
+  .claim .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; color: var(--muted); font-weight: 500; }
+  .claim .avail { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .claim .avail small { font-size: 13px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+  .claim .bal { margin-top: 4px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .claim .bal b { color: #fff; font-variant-numeric: tabular-nums; font-weight: 600; transition: color .2s; }
+  .claim .bal img { width: 14px; }
+  .claim .bal.pulse b { color: var(--green); }
+  .hit-btn {
+    flex: none; height: 52px; padding: 0 22px; border-radius: 14px; font-weight: 800; font-family: var(--font-wide);
+    font-size: 15px; letter-spacing: .04em; text-transform: uppercase;
+    background: linear-gradient(180deg, #ff4f9a, #d6157a); box-shadow: 0 6px 18px rgba(255,45,135,.4), inset 0 1px 0 rgba(255,255,255,.3);
+    transition: transform .08s, opacity .2s;
+  }
+  .hit-btn:active { transform: scale(.96); }
+  .hit-btn:disabled { background: rgba(255,255,255,.1); box-shadow: none; color: var(--muted); font-size: 12px; font-family: var(--font); font-weight: 600; text-transform: none; letter-spacing: 0; cursor: default; }
+
+  /* ---------- Bottom nav ---------- */
+  .nav {
+    background: var(--nav); border-radius: 16px 16px 0 0; display: grid; grid-template-columns: repeat(5, 1fr);
+    padding: 0 0 calc(env(safe-area-inset-bottom) + 16px); z-index: 5;
+  }
+  .nav a {
+    position: relative; height: 48px; display: block; text-decoration: none; text-align: center;
+    font-family: -apple-system, "SF Pro Display", var(--font); font-size: 10px; font-weight: 500; line-height: 12px;
+    color: rgba(243,235,255,.64);
+  }
+  .nav a > img { position: absolute; left: 50%; top: 6px; width: 24px; height: 24px; transform: translateX(-50%); opacity: .64; }
+  .nav a { padding-top: 30px; }
+  .nav a.active { color: #fff; }
+  .nav a.active > img { opacity: 1; }
+  .nav a > img.dot { z-index: 1; width: 6px; height: 6px; left: calc(50% + 9px); top: 6px; opacity: 1; }
+  .nav a.center > img { width: 44px; height: 44px; top: -18px; opacity: 1; object-fit: cover; }
+
+  /* ---------- FX layer ---------- */
+  #fx { position: absolute; inset: 0; pointer-events: none; z-index: 20; overflow: hidden; }
+  .p { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+  .p.coin { width: 26px; height: 33px; background: url(assets/coin.png) center/contain no-repeat; }
+  .p.paper { width: 7px; height: 12px; border-radius: 1px; }
+  .burst {
+    position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; pointer-events: none;
+    background: radial-gradient(circle, rgba(255,255,255,.95) 0 12%, rgba(255,210,63,.8) 13% 26%, rgba(255,45,135,0) 60%);
+    border-radius: 50%; animation: burst .35s ease-out forwards;
+  }
+  @keyframes burst { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+  .pop {
+    position: absolute; transform: translate(-50%, -50%); font-family: var(--font-wide); font-weight: 800; font-size: 26px;
+    color: #fff; text-shadow: 0 2px 0 #d6157a, 0 6px 18px rgba(0,0,0,.4); animation: popUp 1.3s cubic-bezier(.2,.8,.2,1) forwards; white-space: nowrap;
+  }
+  @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -30%) scale(.6); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.1); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -160%) scale(1); } }
+
+  .toast {
+    position: absolute; left: 50%; top: 150px; transform: translateX(-50%) translateY(-10px); z-index: 30;
+    background: rgba(17,12,24,.92); border: 1px solid rgba(255,255,255,.1); padding: 10px 14px; border-radius: 12px;
+    font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; max-width: 86%; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Rules sheet ---------- */
+  .sheet-bg { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 41; background: #1a1225; border-radius: 22px 22px 0 0;
+    padding: 10px 20px calc(env(safe-area-inset-bottom) + 20px); transform: translateY(100%); transition: transform .28s cubic-bezier(.2,.8,.2,1), visibility 0s linear .28s;
+    max-height: 85%; overflow: auto; visibility: hidden;
+  }
+  .open .sheet-bg { opacity: 1; pointer-events: auto; }
+  .open .sheet { transform: none; visibility: visible; transition: transform .28s cubic-bezier(.2,.8,.2,1), visibility 0s; }
+  .sheet .grab { width: 40px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.2); margin: 0 auto 14px; }
+  .sheet h2 { font-family: var(--font-wide); font-size: 18px; margin: 0 0 12px; }
+  .sheet ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); }
+  .sheet ol b { color: #fff; }
+  .demo { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+  .demo .label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .demo .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .demo button { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 600; }
+  .demo button:active { background: rgba(255,255,255,.16); }
+
+  /* ---------- Empty pool ---------- */
+  .ended {
+    position: absolute; inset: 0; z-index: 35; display: none; place-items: center; text-align: center; padding: 24px;
+    background: radial-gradient(circle at 50% 40%, rgba(65,15,109,.6), rgba(17,12,24,.92));
+  }
+  .ended.show { display: grid; }
+  .ended h3 { font-family: var(--font-wide); font-size: 22px; margin: 0 0 8px; }
+  .ended p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  @media (min-width: 431px) {
+    body { display: grid; place-items: center; }
+    .app { height: min(100dvh, 860px); border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  }
+  @media (max-height: 700px) {
+    .pool .value { font-size: 32px; }
+    .pool { height: 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="header">
+    <button class="icon-btn" aria-label="Назад">
+      <svg width="12" height="20" viewBox="0 0 12 20" fill="none"><path d="M10 2 2 10l8 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="title">
+      <h1>PENYATTA</h1>
+      <div class="sub">
+        <span>Выбей максимум</span>
+        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="7" fill="rgba(255,255,255,.55)"/><path d="M7 3.5V7l2.2 1.4" stroke="#110c18" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        <span class="timer" id="timer">9d<i>:</i>23<i>:</i>56<i>:</i>57</span>
+      </div>
+    </div>
+    <button class="icon-btn" aria-label="Правила" id="helpBtn">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9.5" stroke="#fff" stroke-width="1.8"/><path d="M8.6 8.6a2.4 2.4 0 1 1 3.3 2.2c-.6.3-.9.8-.9 1.4v.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="15.4" r="1.1" fill="#fff"/></svg>
+    </button>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="pool" id="pool">
+      <img class="coin" src="assets/coin.png" alt="">
+      <span class="value" id="poolValue">1,000,000</span>
+    </div>
+    <div class="today">За сегодня выбили <b id="today">5081 USDT</b></div>
+    <div class="pool-meta"><div class="bar"><span id="poolBar"></span></div><span id="poolPct">осталось 100%</span></div>
+
+    <div class="rig" id="rig">
+      <div id="swing">
+        <div class="rope-top"></div>
+        <div class="pinata-hit" id="pinata" role="button" aria-label="Ударить пиньяту" style="--pw: 205px">
+          <img id="pinataImg" src="assets/pinata.png" alt="Пиньята-лама">
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-block">
+      <div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+
+      <div class="claim">
+        <div class="info">
+          <div class="label">Твой рейкбек 15%</div>
+          <div class="avail" id="avail">0.00<small>USDT</small></div>
+          <div class="bal" id="balRow"><img src="assets/coin.png" alt="">Баланс <b id="balance">0.00 USDT</b></div>
+        </div>
+        <button class="hit-btn" id="hitBtn">Выбить</button>
+      </div>
+    </div>
+  </main>
+
+  <nav class="nav">
+    <a href="#"><img src="assets/nav/casino.svg" alt="">Casino</a>
+    <a href="#"><img src="assets/nav/sports.svg" alt="">Sports</a>
+    <a href="#" class="center"><img src="assets/nav/chexxy.png" alt="">CHEXXY</a>
+    <a href="#"><img src="assets/nav/esports.svg" alt="">Esports</a>
+    <a href="#" class="active"><img class="dot" src="assets/nav/dot.svg" alt=""><img src="assets/nav/user.svg" alt="">Profile</a>
+  </nav>
+
+  <div id="fx"></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="ended" id="ended"><div><h3>Пиньята пуста</h3><p>Все 1 000 000 USDT разобрали. Следи за следующим сезоном!</p></div></div>
+
+  <div class="sheet-bg" id="sheetBg"></div>
+  <section class="sheet" id="sheet" aria-label="Правила">
+    <div class="grab"></div>
+    <h2>Как выбить USDT</h2>
+    <ol>
+      <li>В пиньяте лежит <b>общий пул 1 000 000 USDT</b> — один на всех игроков.</li>
+      <li>С каждой твоей ставки в казино и на спорт тебе капает <b>15% рейкбека</b>.</li>
+      <li>Жми «Выбить» или бей по ламе — монеты вылетают прямо на твой баланс.</li>
+      <li>Другие игроки тоже бьют. <b>Пул тает на глазах</b> — когда он кончится или выйдет время, рейкбек больше не выбить.</li>
+    </ol>
+    <div class="demo">
+      <div class="label">Демо: сделать ставку (начислится 15%)</div>
+      <div class="row">
+        <button data-bet="100">Казино $100</button>
+        <button data-bet="50">Спорт $50</button>
+        <button data-bet="1000">Казино $1 000</button>
+        <button id="resetBtn">Сбросить демо</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const RAKEBACK = 0.15;
+  const POOL_TOTAL = 1_000_000;
+  const STORE_KEY = 'penyatta-demo-v1';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const $ = (id) => document.getElementById(id);
+  const app = $('app'), fx = $('fx'), swing = $('swing'), pinata = $('pinata'), pinataImg = $('pinataImg');
+
+  /* ---------------- State ---------------- */
+  const defaults = () => ({
+    pool: POOL_TOTAL - 18_432.17,         // some already looted before the user arrived
+    today: 5081,
+    available: 42.18,                     // user's claimable rakeback
+    balance: 120,
+    endsAt: Date.now() + ((9 * 24 + 23) * 3600 + 56 * 60 + 57) * 1000,
+  });
+  let state = defaults();
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && s.endsAt) state = { ...state, ...s }; } catch {}
+  const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {} };
+
+  const fmtInt = (n) => Math.max(0, Math.floor(n)).toLocaleString('en-US');
+  const fmt2 = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Displayed numbers tween toward real state.
+  const shown = { pool: state.pool, balance: state.balance };
+
+  function renderStatic() {
+    $('avail').innerHTML = `${fmt2(state.available)}<small>USDT</small>`;
+    $('today').textContent = `${fmtInt(state.today)} USDT`;
+    const btn = $('hitBtn');
+    if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Пул пуст'; }
+    else if (state.available < 0.01) { btn.disabled = true; btn.textContent = 'Сделай ставку'; }
+    else { btn.disabled = false; btn.textContent = 'Выбить'; }
+    const pct = Math.max(0, state.pool / POOL_TOTAL * 100);
+    $('poolBar').style.width = pct + '%';
+    $('poolPct').textContent = `осталось ${pct >= 10 ? pct.toFixed(1) : pct.toFixed(2)}%`;
+    $('pool').classList.toggle('low', pct < 25);
+    pinata.classList.toggle('empty', state.pool <= 0);
+    $('ended').classList.toggle('show', state.pool <= 0);
+  }
+
+  function renderTween(dt) {
+    const k = 1 - Math.exp(-dt * 6);
+    shown.pool += (state.pool - shown.pool) * k;
+    if (Math.abs(state.pool - shown.pool) < 0.5) shown.pool = state.pool;
+    $('poolValue').textContent = fmtInt(shown.pool);
+    $('balance').textContent = `${fmt2(shown.balance)} USDT`;
+  }
+
+  /* ---------------- Timer ---------------- */
+  function tickTimer() {
+    let s = Math.max(0, Math.floor((state.endsAt - Date.now()) / 1000));
+    const d = Math.floor(s / 86400); s %= 86400;
+    const h = Math.floor(s / 3600); s %= 3600;
+    const m = Math.floor(s / 60); s %= 60;
+    const p = (n) => String(n).padStart(2, '0');
+    $('timer').innerHTML = `${d}d<i>:</i>${p(h)}<i>:</i>${p(m)}<i>:</i>${p(s)}`;
+  }
+  tickTimer(); setInterval(tickTimer, 1000);
+
+  /* ---------------- Pendulum ---------------- */
+  // Damped pendulum around the rope anchor, plus a soft "breeze" so it never fully rests.
+  const pend = { a: 0, v: 0 };
+  const STIFF = 9, DAMP = 1.1, MAX_A = 0.38;
+  function kick(impulse) { pend.v += impulse; }
+  function stepPendulum(dt, t) {
+    const breeze = reduceMotion ? 0 : Math.sin(t * 0.9) * 0.18 + Math.sin(t * 2.3) * 0.05;
+    const acc = -STIFF * Math.sin(pend.a) - DAMP * pend.v + breeze;
+    pend.v += acc * dt;
+    pend.a += pend.v * dt;
+    if (pend.a > MAX_A) { pend.a = MAX_A; pend.v *= -0.4; }
+    if (pend.a < -MAX_A) { pend.a = -MAX_A; pend.v *= -0.4; }
+    swing.style.transform = `rotate(${pend.a}rad)`;
+  }
+
+  /* Pinata size: fit the free space between the pool pill and the bottom block. */
+  function layoutPinata() {
+    const stage = $('stage').getBoundingClientRect();
+    const bottom = document.querySelector('.bottom-block').getBoundingClientRect();
+    // Rope runs from behind the pool pill down past the "today" line and progress bar.
+    const meta = document.querySelector('.pool-meta').getBoundingClientRect();
+    const rope = Math.max(34, meta.bottom - stage.top - 52 + 4);
+    $('rig').style.setProperty('--rope', rope + 'px');
+    const rigTop = 52 + rope;
+    const freeH = bottom.top - stage.top - rigTop - 12;
+    const w = Math.max(120, Math.min(215, freeH / 1.5538, stage.width * 0.6));
+    pinata.style.setProperty('--pw', w + 'px');
+  }
+  addEventListener('resize', layoutPinata);
+
+  /* ---------------- Particles ---------------- */
+  const parts = [];
+  const appRect = () => app.getBoundingClientRect();
+  function pinataCenter() {
+    const r = pinataImg.getBoundingClientRect(), a = appRect();
+    return { x: r.left - a.left + r.width * 0.5, y: r.top - a.top + r.height * 0.55 };
+  }
+  function balanceTarget() {
+    const r = $('balance').getBoundingClientRect(), a = appRect();
+    return { x: r.left - a.left + 10, y: r.top - a.top + r.height / 2 };
+  }
+  const PAPER = ['#a463ff', '#7b3fe4', '#ff3c6e', '#ff5fa2', '#c79bff', '#ffd23f'];
+
+  function spawn(kind, x, y, opts) {
+    const el = document.createElement('div');
+    el.className = 'p ' + kind;
+    if (kind === 'paper') el.style.background = PAPER[(Math.random() * PAPER.length) | 0];
+    fx.appendChild(el);
+    parts.push({ el, kind, x, y, vx: 0, vy: 0, rot: Math.random() * 360, vr: (Math.random() - .5) * 720, life: 0, ...opts });
+  }
+
+  function stepParticles(dt) {
+    const H = app.clientHeight;
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.life += dt;
+      let scale = 1, opacity = 1;
+      if (p.homing && p.life > p.flyAt) {
+        // Phase 2: fly into the user's balance along an eased curve.
+        if (!p.from) p.from = { x: p.x, y: p.y };
+        const t = Math.min(1, (p.life - p.flyAt) / 0.55);
+        const e = t * t * (3 - 2 * t);
+        const tg = p.target;
+        const cx = (p.from.x + tg.x) / 2 + (p.from.x < tg.x ? -60 : 60), cy = Math.min(p.from.y, tg.y) - 80;
+        p.x = (1 - e) * (1 - e) * p.from.x + 2 * (1 - e) * e * cx + e * e * tg.x;
+        p.y = (1 - e) * (1 - e) * p.from.y + 2 * (1 - e) * e * cy + e * e * tg.y;
+        scale = 1 - e * 0.55;
+        if (t >= 1) { p.onArrive && p.onArrive(); p.el.remove(); parts.splice(i, 1); continue; }
+      } else {
+        p.vy += (p.kind === 'paper' ? 520 : 1500) * dt;
+        if (p.kind === 'paper') { p.vx *= 0.985; p.vy = Math.min(p.vy, 160); }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        p.rot += p.vr * dt;
+        if (p.fade) opacity = Math.max(0, 1 - p.life / p.fade);
+        if (p.y > H + 40 || opacity <= 0) { p.el.remove(); parts.splice(i, 1); continue; }
+      }
+      const rot = p.kind === 'coin' ? Math.sin(p.rot / 40) * 25 : p.rot;
+      p.el.style.opacity = opacity;
+      p.el.style.transform = `translate(${p.x - 13}px, ${p.y - 16}px) rotate(${rot}deg) scale(${scale})`;
+    }
+  }
+
+  function burstAt(x, y) {
+    const b = document.createElement('div');
+    b.className = 'burst'; b.style.left = x + 'px'; b.style.top = y + 'px';
+    fx.appendChild(b); setTimeout(() => b.remove(), 400);
+  }
+  function popText(text, x, y) {
+    const el = document.createElement('div');
+    el.className = 'pop'; el.textContent = text; el.style.left = x + 'px'; el.style.top = y + 'px';
+    fx.appendChild(el); setTimeout(() => el.remove(), 1350);
+  }
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+  function squash() {
+    pinataImg.classList.remove('squash'); void pinataImg.offsetWidth; pinataImg.classList.add('squash');
+    if (navigator.vibrate) try { navigator.vibrate(18); } catch {}
+  }
+
+  /* ---------------- Claim (user hits) ---------------- */
+  let claiming = false;
+  function hit(fromX) {
+    const c = pinataCenter();
+    const dir = fromX == null ? (Math.random() < .5 ? -1 : 1) : (fromX < c.x ? 1 : -1);
+
+    if (state.pool <= 0) { kick(dir * 0.4); squash(); return; }
+    if (claiming) { kick(dir * 0.5); squash(); return; }
+
+    if (state.available < 0.01) {
+      kick(dir * 0.9); squash();
+      for (let i = 0; i < 6; i++) spawn('paper', c.x, c.y, { vx: (Math.random() - .5) * 260, vy: -Math.random() * 240, fade: 1.4 });
+      toast('Пусто 🙃 Сделай ставку — 15% от неё можно выбить из ламы');
+      return;
+    }
+
+    claiming = true;
+    const amount = Math.min(state.available, state.pool);
+    state.available -= amount;
+    state.pool -= amount;
+    state.today += amount;
+    save(); renderStatic();
+
+    kick(dir * 1.5); squash();
+    burstAt(c.x + (dir < 0 ? 40 : -40), c.y - 10);
+    popText(`+${fmt2(amount)} USDT`, c.x, c.y - 130);
+    pushTicker({ name: 'Ты', amount, me: true }, true);
+
+    const n = Math.round(Math.min(28, Math.max(8, 6 + Math.log2(amount + 1) * 3)));
+    const per = amount / n;
+    const target = balanceTarget();
+    let arrived = 0;
+    for (let i = 0; i < n; i++) {
+      spawn('coin', c.x + (Math.random() - .5) * 40, c.y + (Math.random() - .5) * 30, {
+        vx: (Math.random() - .5) * 520, vy: -250 - Math.random() * 420,
+        homing: true, flyAt: 0.35 + Math.random() * 0.35, target,
+        onArrive: () => {
+          shown.balance += per; arrived++;
+          const row = $('balRow'); row.classList.add('pulse');
+          if (arrived === n) {
+            shown.balance = state.balance; // snap away float drift
+            setTimeout(() => row.classList.remove('pulse'), 300);
+            claiming = false; renderStatic();
+          }
+        },
+      });
+    }
+    for (let i = 0; i < 22; i++) spawn('paper', c.x, c.y, { vx: (Math.random() - .5) * 420, vy: -120 - Math.random() * 300, fade: 2.2 });
+    state.balance += amount; save();
+    setTimeout(() => toast(`+${fmt2(amount)} USDT на балансе · ты выбил ${(amount / POOL_TOTAL * 100).toFixed(4)}% пула`), 900);
+  }
+
+  pinata.addEventListener('pointerdown', (e) => { const a = appRect(); hit(e.clientX - a.left); });
+  $('hitBtn').addEventListener('click', () => hit(null));
+
+  /* ---------------- Other players looting (FOMO) ---------------- */
+  const NAMES = ['alex', 'max_pro', 'kriptoboss', 'dimon', 'luckyKate', 'sasha77', 'whale', 'neo', 'igor', 'mila', 'betking', 'zhenya', 'tony', 'ruslan', 'vika', 'degen42'];
+  const mask = (s) => s.length <= 3 ? s[0] + '***' : s.slice(0, 3) + '***' + s.slice(-1);
+  function randomClaim() {
+    // Long-tailed: most claims are small, some whales.
+    const r = Math.random();
+    return r < .7 ? 0.5 + Math.random() * 25 : r < .95 ? 25 + Math.random() * 150 : 150 + Math.random() * 900;
+  }
+  function otherHit() {
+    if (state.pool > 0) {
+      const amount = Math.min(randomClaim(), state.pool);
+      state.pool -= amount; state.today += amount;
+      save(); renderStatic();
+      pushTicker({ name: mask(NAMES[(Math.random() * NAMES.length) | 0]), amount });
+      // Someone else's stick hits the llama: small kick and a few coins fall away (not to you).
+      kick((Math.random() < .5 ? -1 : 1) * (0.25 + Math.min(0.5, amount / 600)));
+      const c = pinataCenter();
+      const drops = amount > 100 ? 5 : 2;
+      for (let i = 0; i < drops; i++) spawn('coin', c.x, c.y + 20, { vx: (Math.random() - .5) * 200, vy: -80 - Math.random() * 160, fade: 1.2 });
+      const d = document.createElement('span');
+      d.className = 'delta'; d.textContent = `−${fmt2(amount)}`;
+      $('pool').appendChild(d); setTimeout(() => d.remove(), 1150);
+    }
+    setTimeout(otherHit, 900 + Math.random() * 2200);
+  }
+
+  /* ---------------- Ticker (JS marquee so new items append without jumps) ---------------- */
+  const track = $('ticker');
+  let tickerX = 0;
+  function tickerItem({ name, amount, me }) {
+    const el = document.createElement('span');
+    el.className = 'ticker-item' + (me ? ' me' : '');
+    el.innerHTML = `${me ? '🎉' : '🔥'} ${name} ${me ? 'выбил' : 'выбил'} <em>${fmt2(amount)} USDT</em>`;
+    return el;
+  }
+  const pending = [];
+  function pushTicker(item, priority) {
+    if (priority) {
+      // Put the user's own win right at the visible edge.
+      const el = tickerItem(item);
+      const w = track.parentElement.clientWidth;
+      let insertBefore = null;
+      for (const child of track.children) { if (child.offsetLeft + tickerX > w * 0.25) { insertBefore = child; break; } }
+      track.insertBefore(el, insertBefore);
+    } else pending.push(item);
+  }
+  function stepTicker(dt) {
+    const w = track.parentElement.clientWidth;
+    tickerX -= dt * 42;
+    // Recycle items that scrolled off the left edge.
+    const first = track.firstElementChild;
+    if (first && first.offsetLeft + first.offsetWidth + tickerX < 0) {
+      const shift = first.offsetWidth + 28;
+      first.remove(); tickerX += shift;
+    }
+    // Keep the track filled to the right.
+    while (track.scrollWidth + tickerX < w * 2) {
+      const item = pending.shift() || { name: mask(NAMES[(Math.random() * NAMES.length) | 0]), amount: randomClaim() };
+      track.appendChild(tickerItem(item));
+    }
+    track.style.transform = `translateX(${tickerX}px)`;
+  }
+
+  /* ---------------- Rules sheet + demo bets ---------------- */
+  $('helpBtn').addEventListener('click', () => app.classList.add('open'));
+  $('sheetBg').addEventListener('click', () => app.classList.remove('open'));
+  document.querySelectorAll('[data-bet]').forEach((b) => b.addEventListener('click', () => {
+    const bet = Number(b.dataset.bet);
+    state.available += bet * RAKEBACK; save(); renderStatic();
+    app.classList.remove('open');
+    toast(`Ставка $${bet.toLocaleString('ru-RU')} → +${fmt2(bet * RAKEBACK)} USDT к выбиванию`);
+  }));
+  $('resetBtn').addEventListener('click', () => {
+    state = defaults(); shown.pool = state.pool; shown.balance = state.balance; save(); renderStatic(); app.classList.remove('open');
+  });
+
+  /* ---------------- Main loop ---------------- */
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.033, (now - last) / 1000); last = now;
+    stepPendulum(dt, now / 1000);
+    stepParticles(dt);
+    stepTicker(dt);
+    renderTween(dt);
+    requestAnimationFrame(frame);
+  }
+
+  renderStatic();
+  layoutPinata();
+  requestAnimationFrame(frame);
+  setTimeout(otherHit, 1200);
+})();
+</script>
+</body>
+</html>
