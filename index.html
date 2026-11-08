@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Kopilka USDT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,6 +32,8 @@
   .trim { line-height: .7em !important; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; height: 100%; background: #07050a; color: var(--text); font-family: var(--font); overflow: hidden; }
+  /* No double-tap zoom anywhere: players tap the llama fast. "manipulation" keeps scrolling. */
+  html, body, button, a, .app, .main { touch-action: manipulation; }
   button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
   img { display: block; }
 
@@ -105,7 +107,7 @@
   /* Llama on its rope. #swing rotates around the rope's top. */
   .rig { position: absolute; top: 73.35px; left: calc(50% - 14.67px - 126.33px); width: 252.67px; height: 252.67px; z-index: 2; }
   #swing { position: absolute; inset: 0; transform-origin: 55.5% 0; will-change: transform; }
-  .pinata-hit { position: absolute; inset: 0; cursor: pointer; touch-action: manipulation; }
+  .pinata-hit { position: absolute; inset: 0; cursor: pointer; touch-action: none; }
   .pinata-hit img {
     width: 100%; height: 100%; object-fit: cover; pointer-events: none; transform-origin: 55% 30%;
     -webkit-mask: linear-gradient(#000 197.8px, rgba(0,0,0,.6) 210px, rgba(0,0,0,.15) 220px, transparent 226px) top / 100% 226px no-repeat;
@@ -559,6 +561,16 @@
   }
 
   pinata.addEventListener('pointerdown', (e) => { const a = appRect(); hit(e.clientX - a.left); });
+
+  // iOS Safari ignores user-scalable=no: block double-tap and pinch zoom explicitly.
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd < 350) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+  document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+  ['gesturestart', 'gesturechange'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
   $('hitBtn').addEventListener('click', () => hit(null));
 
   /* ---------------- Recent rewards feed ---------------- */
