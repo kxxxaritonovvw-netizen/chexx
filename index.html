@@ -3,140 +3,198 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Penyatta</title>
+<title>Kopilka USDT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-dark: #110c18;
-    --stage: #410f6d;
-    --pill-from: #6a22b8;
-    --pill-to: #9b3cff;
-    --accent: #8b1ffe;
-    --hot: #ff2d87;
+    --bg-base: #110c18;
+    --bg-primary: #221b2d;
+    --brand: #fe0760;
     --green: #2fd27a;
     --text: #ffffff;
-    --muted: rgba(255,255,255,.62);
-    --nav: #110c18;
-    --font-wide: "Unbounded", system-ui, sans-serif;
-    --font: "Inter", -apple-system, system-ui, sans-serif;
+    --text-secondary: rgba(243,235,255,.64);
+    --text-tertiary: rgba(243,235,255,.48);
+    --ghost: rgba(243,235,255,.24);
+    /* Balgin has no Cyrillic: Russian words in the wide face fall back to Unbounded. */
+    --font-wide: "Balgin Expanded", "Unbounded", system-ui, sans-serif;
+    --font: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   }
+  @font-face {
+    font-family: "Balgin Expanded"; font-weight: 700; font-style: normal; font-display: swap;
+    src: url(assets/fonts/balgin-boldexpanded-webfont.woff2) format("woff2");
+    /* The webfont's OS/2 cap height is wrong (700 vs real 1434/2048), so text-box-trim over-cuts.
+       Instead make the font box exactly cap-top → baseline; Balgin text here is caps/digits only. */
+    ascent-override: 70.02%; descent-override: 0%; line-gap-override: 0%;
+  }
+  /* Figma trims Balgin lines to cap height: with the overrides above, line-height .7em does the same. */
+  .trim { line-height: .7em !important; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; height: 100%; background: #07050a; color: var(--text); font-family: var(--font); overflow: hidden; }
   button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
+  img { display: block; }
 
   .app {
     position: relative; margin: 0 auto; max-width: 430px; height: 100dvh;
-    display: flex; flex-direction: column; background: var(--stage); overflow: clip;
+    display: flex; flex-direction: column; background: var(--bg-base); overflow: clip;
     user-select: none; -webkit-user-select: none;
   }
 
-  /* ---------- Header ---------- */
-  .header {
-    background: var(--bg-dark); padding: calc(env(safe-area-inset-top) + 10px) 16px 12px;
-    display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; z-index: 5;
+  /* ---------- Header: back · KOPILKA USDT + timer · help ---------- */
+  .header { position: relative; flex: none; height: calc(48px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); background: var(--bg-base); z-index: 5; }
+  .header .icon { position: absolute; bottom: 4px; padding: 10px; }
+  .header .icon img { width: 20px; height: 20px; }
+  .header .back { left: 6px; }
+  .header .help { right: 6px; }
+  .header .title { position: absolute; left: 50%; bottom: 7px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; white-space: nowrap; }
+  .header h1 { margin: 0; font-family: var(--font-wide); font-weight: 700; font-size: 16px; letter-spacing: -.32px; text-transform: uppercase; }
+  .timer-row { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 14px; font-weight: 600; color: var(--text-secondary); }
+  .timer-row .clock { width: 12px; height: 12px; opacity: .64; }
+  .timer { display: flex; align-items: center; font-variant-numeric: tabular-nums; }
+  .timer i { width: 6px; height: 14px; display: grid; place-items: center; }
+  .timer i img { width: 2px; height: 6px; }
+
+  /* ---------- Scroll area ---------- */
+  .main { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; }
+  .main::-webkit-scrollbar { display: none; }
+
+  /* ---------- Hero (375px, its glow runs on to 572px behind the card) ---------- */
+  .hero { position: relative; height: 375px; }
+  .hero-bg {
+    position: absolute; left: 0; right: 0; top: 0; height: 572px; pointer-events: none;
+    background: radial-gradient(232px 275.68px at 50% 275.68px,
+      #7f00ff 0%, #6300c4 24.9%, #47008a 49.8%, #31006b 59.7%, #1b004d 69.7%, #160633 84.8%, #110c18 100%);
   }
-  .header .icon-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; }
-  .header .icon-btn:active { background: rgba(255,255,255,.08); }
-  .title { text-align: center; }
-  .title h1 { margin: 0; font-family: var(--font-wide); font-weight: 800; font-size: 17px; letter-spacing: .06em; }
-  .title .sub { margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.9); }
-  .timer { display: inline-flex; align-items: center; gap: 2px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .timer i { font-style: normal; color: var(--muted); padding: 0 1px; }
+  .rays {
+    position: absolute; top: -27.29px; left: 50%; width: 360px; height: 404.6px; transform: translateX(-50%); pointer-events: none;
+    background: url(assets/v2/rays.jpg) center/cover no-repeat; opacity: .07; mix-blend-mode: plus-lighter;
+    -webkit-mask-image: radial-gradient(372.9px 181px at 50% 206.2px, #000 51%, transparent 100%);
+            mask-image: radial-gradient(372.9px 181px at 50% 206.2px, #000 51%, transparent 100%);
+  }
+  /* Centre pieces are laid out on the 360px design grid. */
+  .grid360 { position: absolute; top: 0; left: 50%; width: 360px; height: 100%; margin-left: -180px; }
 
-  /* ---------- Stage ---------- */
-  .stage { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; }
-
+  /* Green "Left in piniatta" badge */
+  .pool-wrap { position: absolute; top: 8px; left: calc(50% + .28px); transform: translateX(-50%); z-index: 4; width: 212px; height: 55.4px; display: flex; align-items: center; justify-content: center; }
   .pool {
-    position: relative; z-index: 4; margin-top: 18px; display: flex; align-items: center;
-    height: 50px; padding: 0 18px 0 44px; border-radius: 999px;
-    background: linear-gradient(90deg, var(--pill-from) 0%, var(--accent) 60%, var(--pill-to) 100%);
-    box-shadow: 0 6px 24px rgba(139,31,254,.35);
-    transition: box-shadow .3s;
+    position: relative; transform: rotate(-2deg); height: 48.086px; padding: 0 12px 0 32px; border-radius: 16px;
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 8px;
+    background: linear-gradient(90deg, #00431f, #00873f);
+    font-family: var(--font-wide); font-weight: 700; text-transform: uppercase; white-space: nowrap; transition: filter .3s;
   }
-  .pool .coin { position: absolute; left: -16px; top: 50%; width: 48px; transform: translateY(-50%) rotate(-8deg); filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
-  .pool .value { font-size: 40px; font-weight: 500; letter-spacing: -.01em; font-variant-numeric: tabular-nums; line-height: 1; }
-  .pool.low { background: linear-gradient(90deg, #a2245c 0%, #e8336f 60%, #ff5a5a 100%); }
+  .pool .ttl { font-size: 10px; letter-spacing: -.2px; color: var(--text-secondary); }
+  .pool .value { font-size: 22px; letter-spacing: -.44px; font-variant-numeric: tabular-nums; }
+  .pool .coin {
+    position: absolute; left: 5.3px; top: calc(50% - 1.66px); width: 47.282px; height: 53.476px; object-fit: cover;
+    transform: translate(-50%, -50%) rotate(-20.26deg);
+    filter: drop-shadow(0 7px 7px rgba(0,0,0,.5)) drop-shadow(0 0 12px #00412e);
+  }
+  .pool.low { filter: hue-rotate(-130deg) saturate(1.4); }
   .pool .delta {
-    position: absolute; right: 10px; top: -4px; font-size: 13px; font-weight: 700; color: #ff7aa8;
-    pointer-events: none; animation: deltaUp 1.1s ease-out forwards;
+    position: absolute; left: calc(100% + 6px); top: 14px; font-family: var(--font); font-size: 12px; font-weight: 700; color: #ff7aa8;
+    text-transform: none; pointer-events: none; animation: deltaUp 1.1s ease-out forwards;
   }
-  @keyframes deltaUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-22px); } }
-  .pool-meta { margin-top: 8px; z-index: 4; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); font-weight: 500; }
-  .bar { width: 120px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.14); overflow: hidden; }
-  .bar > span { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--hot), #ffb84d); border-radius: 4px; transition: width .6s ease; }
+  @keyframes deltaUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-16px); } }
 
-  /* Pinata on a rope. The anchor sits just under the pool pill; #swing rotates around it. */
-  .rig { position: absolute; left: 50%; top: 52px; width: 0; height: 0; z-index: 3; }
-  .rope-top {
-    position: absolute; left: -2px; top: 0; width: 4px; height: var(--rope, 34px); border-radius: 2px;
-    background: repeating-linear-gradient(180deg, #ff5fa2 0 6px, #ffd23f 6px 12px, #4fd1c5 12px 18px, #7b8cff 18px 24px);
+  /* "За сегодня уже забрали N USDT" */
+  .today { position: absolute; top: 76.1px; left: calc(50% - 3.28px); transform: translate(-50%, -50%) rotate(-2deg); z-index: 4; display: flex; gap: 6px; white-space: nowrap; font-size: 14px; line-height: 16px; }
+  .today span { color: var(--text-secondary); font-weight: 500; }
+  .today b { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* Llama on its rope. #swing rotates around the rope's top. */
+  .rig { position: absolute; top: 73.35px; left: calc(50% - 14.67px - 126.33px); width: 252.67px; height: 252.67px; z-index: 2; }
+  #swing { position: absolute; inset: 0; transform-origin: 55.5% 0; will-change: transform; }
+  .pinata-hit { position: absolute; inset: 0; cursor: pointer; touch-action: manipulation; }
+  .pinata-hit img {
+    width: 100%; height: 100%; object-fit: cover; pointer-events: none; transform-origin: 55% 30%;
+    -webkit-mask: linear-gradient(#000 197.8px, rgba(0,0,0,.6) 210px, rgba(0,0,0,.15) 220px, transparent 226px) top / 100% 226px no-repeat;
+            mask: linear-gradient(#000 197.8px, rgba(0,0,0,.6) 210px, rgba(0,0,0,.15) 220px, transparent 226px) top / 100% 226px no-repeat;
   }
-  #swing { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
-  #swing .rope-top { top: 0; }
-  .pinata-hit {
-    position: absolute; top: calc(var(--rope, 34px) - 4px); /* image rope starts where rope-top ends */
-    width: var(--pw); height: calc(var(--pw) * 1.5538);
-    left: calc(var(--pw) * -0.593);
-    transform-origin: 59.3% 0; transform: rotate(-5deg); /* straighten the baked-in rope */
-    cursor: pointer; touch-action: manipulation;
-  }
-  .pinata-hit img { width: 100%; height: 100%; display: block; pointer-events: none; filter: drop-shadow(0 18px 24px rgba(0,0,0,.35)); transform-origin: 59% 20%; }
   .pinata-hit img.squash { animation: squash .28s ease-out; }
   @keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.06, .93); } 60% { transform: scale(.97, 1.04); } 100% { transform: scale(1); } }
-  .pinata-hit.empty img { filter: grayscale(.85) brightness(.7) drop-shadow(0 18px 24px rgba(0,0,0,.35)); }
+  .pinata-hit.empty img { filter: grayscale(.85) brightness(.7); }
 
-  .bottom-block { margin-top: auto; width: 100%; padding-bottom: 12px; z-index: 4; }
-  .today { position: relative; z-index: 4; margin-top: 12px; text-align: center; font-weight: 700; font-size: 15px; letter-spacing: .01em; text-transform: uppercase; text-shadow: 0 1px 6px rgba(65,15,109,.9); }
-  .today b { font-family: var(--font-wide); font-weight: 800; font-variant-numeric: tabular-nums; }
-  .ticker { margin-top: 0; height: 20px; overflow: hidden; position: relative; white-space: nowrap; }
-  .ticker-track { position: absolute; left: 0; top: 0; display: flex; gap: 28px; will-change: transform; }
-  .ticker-item { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.92); display: inline-flex; gap: 6px; align-items: center; }
-  .ticker-item em { font-style: normal; color: #ffd23f; }
-  .ticker-item.me { color: var(--green); }
-  .ticker-item.me em { color: var(--green); }
-
-  /* Claim card */
-  .claim {
-    margin: 14px 16px 0; padding: 12px 12px 12px 16px; border-radius: 18px;
-    background: rgba(17,12,24,.55); border: 1px solid rgba(255,255,255,.08);
-    display: flex; align-items: center; gap: 12px; backdrop-filter: blur(8px);
+  /* Recent rewards: live feed, pinned 16px from the left edge (centre at y 261 in the hero). */
+  .recent { position: absolute; left: 16px; top: 195px; width: 88px; z-index: 3; display: flex; flex-direction: column; gap: 8px; }
+  .recent .head { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 12px; font-weight: 600; }
+  .recent .head img { width: 16px; height: 16px; flex: none; }
+  .recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; height: 100px; }
+  .chip {
+    align-self: flex-start; display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: 12px;
+    background: rgba(0,0,0,.64); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); white-space: nowrap;
+    animation: chipIn .25s ease-out;
   }
-  .claim .info { flex: 1; min-width: 0; }
-  .claim .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; color: var(--muted); font-weight: 500; }
-  .claim .avail { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
-  .claim .avail small { font-size: 13px; font-weight: 600; color: var(--muted); margin-left: 4px; }
-  .claim .bal { margin-top: 4px; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-  .claim .bal b { color: #fff; font-variant-numeric: tabular-nums; font-weight: 600; transition: color .2s; }
-  .claim .bal img { width: 14px; }
-  .claim .bal.pulse b { color: var(--green); }
+  .chip .who { font-size: 10px; line-height: 10px; font-weight: 600; color: var(--text-secondary); }
+  .chip img { width: 12px; height: 12px; }
+  .chip b { font-size: 12px; line-height: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chip.me { background: rgba(47,210,122,.28); }
+  .chip.me .who, .chip.me b { color: var(--green); }
+  @keyframes chipIn { from { opacity: .3; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Claim card: 328×160, overlaps the hero bottom by 32px ---------- */
+  .card {
+    position: relative; z-index: 4; margin: -32px 16px 0; height: 160px; border-radius: 24px; background: var(--bg-base);
+    padding: 16px 16px 12px; display: flex; flex-direction: column;
+  }
+  .card .row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card .label { font-size: 12px; line-height: 14px; font-weight: 700; }
+  .card .label span { color: var(--text-secondary); font-weight: 500; }
+  .card .rules { font-size: 12px; line-height: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
+  .card .avail { margin-top: 12px; display: flex; align-items: baseline; gap: 6px; }
+  .card .avail b { font-family: var(--font-wide); font-weight: 700; font-size: 26px; letter-spacing: -.52px; font-variant-numeric: tabular-nums; }
+  .card .avail small { font-size: 14px; line-height: 16px; font-weight: 500; color: var(--text-secondary); }
+  .meta { margin-top: 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 12px; line-height: 14px; color: var(--text-secondary); font-weight: 500; }
+  .meta b { color: #fff; font-weight: 600; font-variant-numeric: tabular-nums; transition: color .2s; }
+  .meta .bal.pulse b { color: var(--green); }
+  .bar { flex: none; width: 40px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.14); overflow: hidden; }
+  .bar > span { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--brand), #ffb84d); border-radius: 4px; transition: width .6s ease; }
+  .meta .sep { flex: 1; }
   .hit-btn {
-    flex: none; height: 52px; padding: 0 22px; border-radius: 14px; font-weight: 800; font-family: var(--font-wide);
-    font-size: 15px; letter-spacing: .04em; text-transform: uppercase;
-    background: linear-gradient(180deg, #ff4f9a, #d6157a); box-shadow: 0 6px 18px rgba(255,45,135,.4), inset 0 1px 0 rgba(255,255,255,.3);
-    transition: transform .08s, opacity .2s;
+    margin-top: auto; height: 40px; width: 100%; border-radius: 10px; background: var(--brand);
+    font-size: 14px; line-height: 20px; font-weight: 600; transition: transform .08s, opacity .2s;
   }
-  .hit-btn:active { transform: scale(.96); }
-  .hit-btn.idle { opacity: .55; box-shadow: none; } /* nothing to claim yet, still tappable */
-  .hit-btn:disabled { background: rgba(255,255,255,.1); box-shadow: none; color: var(--muted); font-size: 12px; font-family: var(--font); font-weight: 600; text-transform: none; letter-spacing: 0; cursor: default; }
+  .hit-btn:active { transform: scale(.98); }
+  .hit-btn.idle { opacity: .55; } /* nothing to claim yet, still tappable */
+  .hit-btn:disabled { background: rgba(255,255,255,.1); color: var(--text-secondary); cursor: default; }
+
+  /* ---------- Games: heading · tabs · 3×4 grid · view all ---------- */
+  .games { position: relative; z-index: 1; margin: 84px 16px 0; padding-bottom: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .games h2 { margin: 0; text-align: center; font-family: var(--font-wide); font-weight: 700; font-size: 14px; line-height: 16px; letter-spacing: -.28px; text-transform: uppercase; }
+  .seg { display: flex; min-height: 40px; padding: 2px; border-radius: 12px; background: var(--bg-primary); }
+  .seg button {
+    position: relative; flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 12px; border-radius: 8px;
+    font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .28px; color: var(--text-secondary); transition: background .15s, color .15s;
+  }
+  .seg button img { width: 16px; height: 16px; }
+  .seg button + button::before { content: ""; position: absolute; left: -.5px; top: 50%; width: 1px; height: 16px; margin-top: -8px; border-radius: 1px; background: #0e121b; }
+  .seg button.on { background: var(--bg-base); color: #fff; }
+  .seg button.on::before, .seg button.on + button::before { opacity: 0; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .game { position: relative; aspect-ratio: 172 / 229.33; border-radius: 12px; overflow: hidden; background: var(--bg-primary); }
+  .game > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .game .new {
+    position: absolute; left: 8px; top: 8px; height: 16px; padding: 0 4px; border-radius: 99px; background: #ff4247;
+    font-size: 11px; line-height: 16px; letter-spacing: .24px;
+  }
+  .game .fav { position: absolute; right: 12px; top: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(14,18,27,.72); display: grid; place-items: center; }
+  .game .fav img { width: 16px; height: 16px; }
+  .game .fav.on { background: var(--brand); }
+  .view-all { height: 40px; border-radius: 10px; background: rgba(243,235,255,.24); font-size: 14px; line-height: 20px; font-weight: 600; }
 
   /* ---------- Bottom nav ---------- */
   .nav {
-    background: var(--nav); border-radius: 16px 16px 0 0; display: grid; grid-template-columns: repeat(5, 1fr);
+    flex: none; background: var(--bg-primary); border-radius: 16px 16px 0 0; display: grid; grid-template-columns: repeat(5, 1fr);
     padding: 0 0 calc(env(safe-area-inset-bottom) + 16px); z-index: 5;
   }
   .nav a {
-    position: relative; height: 48px; display: block; text-decoration: none; text-align: center;
-    font-family: -apple-system, "SF Pro Display", var(--font); font-size: 10px; font-weight: 500; line-height: 12px;
-    color: rgba(243,235,255,.64);
+    position: relative; height: 48px; display: block; text-decoration: none; text-align: center; padding-top: 30px;
+    font-size: 10px; font-weight: 500; line-height: 12px; color: var(--text-secondary);
   }
-  .nav a > img { position: absolute; left: 50%; top: 6px; width: 24px; height: 24px; transform: translateX(-50%); opacity: .64; }
-  .nav a { padding-top: 30px; }
+  .nav a > img { position: absolute; left: calc(50% - .5px); top: 6px; width: 24px; height: 24px; transform: translateX(-50%); }
   .nav a.active { color: #fff; }
-  .nav a.active > img { opacity: 1; }
-  .nav a > img.dot { z-index: 1; width: 6px; height: 6px; left: calc(50% + 9px); top: 6px; opacity: 1; }
-  .nav a.center > img { width: 44px; height: 44px; top: -18px; opacity: 1; object-fit: cover; }
+  .nav a > img.dot { z-index: 1; width: 6px; height: 6px; left: calc(50% + 9px); top: 6px; }
+  .nav a.center > img { width: 44px; height: 44px; top: -18px; object-fit: cover; }
 
   /* ---------- FX layer ---------- */
   #fx { position: absolute; inset: 0; pointer-events: none; z-index: 20; overflow: hidden; }
@@ -145,20 +203,20 @@
   .p.paper { width: 7px; height: 12px; border-radius: 1px; }
   .burst {
     position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; pointer-events: none;
-    background: radial-gradient(circle, rgba(255,255,255,.95) 0 12%, rgba(255,210,63,.8) 13% 26%, rgba(255,45,135,0) 60%);
+    background: radial-gradient(circle, rgba(255,255,255,.95) 0 12%, rgba(255,210,63,.8) 13% 26%, rgba(254,7,96,0) 60%);
     border-radius: 50%; animation: burst .35s ease-out forwards;
   }
   @keyframes burst { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
   .pop {
-    position: absolute; transform: translate(-50%, -50%); font-family: var(--font-wide); font-weight: 800; font-size: 26px;
-    color: #fff; text-shadow: 0 2px 0 #d6157a, 0 6px 18px rgba(0,0,0,.4); animation: popUp 1.3s cubic-bezier(.2,.8,.2,1) forwards; white-space: nowrap;
+    position: absolute; transform: translate(-50%, -50%); font-family: var(--font-wide); font-weight: 700; font-size: 24px;
+    color: #fff; text-shadow: 0 2px 0 #d6045a, 0 6px 18px rgba(0,0,0,.4); animation: popUp 1.3s cubic-bezier(.2,.8,.2,1) forwards; white-space: nowrap;
   }
   @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -30%) scale(.6); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.1); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -160%) scale(1); } }
 
   .toast {
-    position: absolute; left: 50%; top: 150px; transform: translateX(-50%) translateY(-10px); z-index: 30;
+    position: absolute; left: 50%; top: 120px; transform: translateX(-50%) translateY(-10px); z-index: 30;
     background: rgba(17,12,24,.92); border: 1px solid rgba(255,255,255,.1); padding: 10px 14px; border-radius: 12px;
-    font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; max-width: 86%; text-align: center;
+    font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; width: max-content; max-width: 86%; text-align: center;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -176,7 +234,7 @@
   .sheet ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); }
   .sheet ol b { color: #fff; }
   .demo { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
-  .demo .label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .demo .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
   .demo .row { display: flex; gap: 8px; flex-wrap: wrap; }
   .demo button { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 600; }
   .demo button:active { background: rgba(255,255,255,.16); }
@@ -188,66 +246,79 @@
   }
   .ended.show { display: grid; }
   .ended h3 { font-family: var(--font-wide); font-size: 22px; margin: 0 0 8px; }
-  .ended p { margin: 0; color: var(--muted); font-size: 14px; }
+  .ended p { margin: 0; color: var(--text-secondary); font-size: 14px; }
 
   @media (min-width: 431px) {
     body { display: grid; place-items: center; }
     .app { height: min(100dvh, 860px); border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
-  }
-  @media (max-height: 700px) {
-    .pool .value { font-size: 32px; }
-    .pool { height: 44px; }
   }
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <header class="header">
-    <button class="icon-btn" aria-label="Назад">
-      <svg width="12" height="20" viewBox="0 0 12 20" fill="none"><path d="M10 2 2 10l8 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+    <button class="icon back" aria-label="Назад"><img src="assets/v3/chevron-left20.svg" alt=""></button>
     <div class="title">
-      <h1>PENYATTA</h1>
-      <div class="sub">
-        <span>Выбей максимум</span>
-        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="7" fill="rgba(255,255,255,.55)"/><path d="M7 3.5V7l2.2 1.4" stroke="#110c18" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-        <span class="timer" id="timer">9d<i>:</i>23<i>:</i>56<i>:</i>57</span>
-      </div>
+      <h1 class="trim">Kopilka USDT</h1>
+      <div class="timer-row"><img class="clock" src="assets/v3/clock.svg" alt=""><span class="timer" id="timer"></span></div>
     </div>
-    <button class="icon-btn" aria-label="Правила" id="helpBtn">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9.5" stroke="#fff" stroke-width="1.8"/><path d="M8.6 8.6a2.4 2.4 0 1 1 3.3 2.2c-.6.3-.9.8-.9 1.4v.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="15.4" r="1.1" fill="#fff"/></svg>
-    </button>
+    <button class="icon help" id="helpBtn" aria-label="Правила"><img src="assets/v3/circle-question.svg" alt=""></button>
   </header>
 
-  <main class="stage" id="stage">
-    <div class="pool" id="pool">
-      <img class="coin" src="assets/coin.png" alt="">
-      <span class="value" id="poolValue">1,000,000</span>
-    </div>
-    <div class="today">За сегодня выбили <b id="today">5081 USDT</b></div>
-    <div class="pool-meta"><div class="bar"><span id="poolBar"></span></div><span id="poolPct">осталось 100%</span></div>
+  <main class="main" id="main">
+    <section class="hero" id="stage">
+      <div class="hero-bg"></div>
+      <div class="rays"></div>
+      <div class="grid360">
+        <div class="pool-wrap">
+          <div class="pool" id="pool">
+            <img class="coin" src="assets/v2/coin-badge.png" alt="">
+            <span class="ttl trim">Left in piniatta</span>
+            <span class="value trim" id="poolValue">1,000,000</span>
+          </div>
+        </div>
 
-    <div class="rig" id="rig">
-      <div id="swing">
-        <div class="rope-top"></div>
-        <div class="pinata-hit" id="pinata" role="button" aria-label="Ударить пиньяту" style="--pw: 205px">
-          <img id="pinataImg" src="assets/pinata.png" alt="Пиньята-лама">
+        <div class="today"><span>За сегодня уже забрали</span><b id="today">4582 USDT</b></div>
+
+        <div class="rig" id="rig">
+          <div id="swing">
+            <div class="pinata-hit" id="pinata" role="button" aria-label="Ударить пиньяту">
+              <img id="pinataImg" src="assets/v2/llama.png" alt="Пиньята-лама">
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="bottom-block">
-      <div class="ticker"><div class="ticker-track" id="ticker"></div></div>
-
-      <div class="claim">
-        <div class="info">
-          <div class="label">Твой рейкбек 15%</div>
-          <div class="avail" id="avail">0.00<small>USDT</small></div>
-          <div class="bal" id="balRow"><img src="assets/coin.png" alt="">Баланс <b id="balance">0.00 USDT</b></div>
-        </div>
-        <button class="hit-btn" id="hitBtn">Выбить</button>
+      <div class="recent">
+        <div class="head"><img src="assets/v3/users.svg" alt=""><span>Последние<br>награды</span></div>
+        <ul id="recent"></ul>
       </div>
-    </div>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <div class="label">Твой рейкбек <span>· 1.5% со ставок</span></div>
+        <button class="rules" id="rulesBtn">Правила</button>
+      </div>
+      <div class="avail"><b class="trim" id="avail">0.00</b><small>USDT</small></div>
+      <div class="meta">
+        <div class="bar"><span id="poolBar"></span></div><span id="poolPct">осталось 100%</span>
+        <span class="sep"></span>
+        <span class="bal" id="balRow">Баланс <b id="balance">29.20</b> USDT</span>
+      </div>
+      <button class="hit-btn" id="hitBtn">Claim now in BTC</button>
+    </section>
+
+    <section class="games">
+      <h2 class="trim-lines">Claimers are play here!<br>Lets earn BTC</h2>
+      <div class="seg" id="seg">
+        <button class="on" data-tab="slots"><img src="assets/v3/seg-slots.svg" alt="">Slots</button>
+        <button data-tab="esports"><img src="assets/v3/seg-esports.svg" alt="">Esports</button>
+        <button data-tab="sports"><img src="assets/v3/seg-sports.svg" alt="">Sports</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <button class="view-all" id="viewAll">View all slots →</button>
+    </section>
   </main>
 
   <nav class="nav">
@@ -268,17 +339,17 @@
     <div class="grab"></div>
     <h2>Как выбить USDT</h2>
     <ol>
-      <li>В пиньяте лежит <b>общий пул 1 000 000 USDT</b> — один на всех игроков.</li>
-      <li>С каждой твоей ставки в казино и на спорт тебе капает <b>15% рейкбека</b>.</li>
-      <li>Жми «Выбить» или бей по ламе — монеты вылетают прямо на твой баланс.</li>
+      <li>В пиньяте лежит <b>общий пул 1 000 000 USDT</b> — один на всех игроков платформы.</li>
+      <li>С каждой ставки в слотах, казино, киберспорте и спорте тебе капает <b>1.5% рейкбека</b>.</li>
+      <li>Жми «Claim» или бей по ламе — монеты летят прямо на твой баланс.</li>
       <li>Другие игроки тоже бьют. <b>Пул тает на глазах</b> — когда он кончится или выйдет время, рейкбек больше не выбить.</li>
     </ol>
     <div class="demo">
-      <div class="label">Демо: сделать ставку (начислится 15%)</div>
+      <div class="label">Демо: сделать ставку (начислится 1.5%)</div>
       <div class="row">
         <button data-bet="100">Казино $100</button>
-        <button data-bet="50">Спорт $50</button>
-        <button data-bet="1000">Казино $1 000</button>
+        <button data-bet="500">Спорт $500</button>
+        <button data-bet="5000">Слоты $5 000</button>
         <button id="resetBtn">Сбросить демо</button>
       </div>
     </div>
@@ -288,9 +359,9 @@
 <script>
 (() => {
   'use strict';
-  const RAKEBACK = 0.15;
+  const RAKEBACK = 0.015;
   const POOL_TOTAL = 1_000_000;
-  const STORE_KEY = 'penyatta-demo-v1';
+  const STORE_KEY = 'penyatta-demo-v3';
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const $ = (id) => document.getElementById(id);
@@ -299,10 +370,10 @@
   /* ---------------- State ---------------- */
   const defaults = () => ({
     pool: POOL_TOTAL - 18_432.17,         // some already looted before the user arrived
-    today: 5081,
-    available: 42.18,                     // user's claimable rakeback
-    balance: 120,
-    endsAt: Date.now() + ((9 * 24 + 23) * 3600 + 56 * 60 + 57) * 1000,
+    today: 4582,
+    available: 14.12,                     // user's claimable rakeback
+    balance: 29.2,
+    endsAt: Date.now() + ((39 * 24 + 23) * 3600 + 56 * 60 + 57) * 1000,
   });
   let state = defaults();
   try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && s.endsAt) state = { ...state, ...s }; } catch {}
@@ -315,11 +386,11 @@
   const shown = { pool: state.pool, balance: state.balance };
 
   function renderStatic() {
-    $('avail').innerHTML = `${fmt2(state.available)}<small>USDT</small>`;
-    $('today').textContent = `${fmtInt(state.today)} USDT`;
+    $('avail').textContent = fmt2(state.available);
+    $('today').textContent = `${Math.floor(state.today)} USDT`;
     const btn = $('hitBtn');
     if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Пул пуст'; }
-    else { btn.disabled = false; btn.textContent = 'Выбить'; btn.classList.toggle('idle', state.available < 0.01); }
+    else { btn.disabled = false; btn.textContent = 'Claim now in BTC'; btn.classList.toggle('idle', state.available < 0.01); }
     const pct = Math.max(0, state.pool / POOL_TOTAL * 100);
     $('poolBar').style.width = pct + '%';
     $('poolPct').textContent = `осталось ${pct >= 10 ? pct.toFixed(1) : pct.toFixed(2)}%`;
@@ -333,27 +404,28 @@
     shown.pool += (state.pool - shown.pool) * k;
     if (Math.abs(state.pool - shown.pool) < 0.5) shown.pool = state.pool;
     $('poolValue').textContent = fmtInt(shown.pool);
-    $('balance').textContent = `${fmt2(shown.balance)} USDT`;
+    $('balance').textContent = fmt2(shown.balance);
   }
 
   /* ---------------- Timer ---------------- */
+  const DOT = '<i><img src="assets/v3/dots.svg" alt=""></i>';
   function tickTimer() {
     let s = Math.max(0, Math.floor((state.endsAt - Date.now()) / 1000));
     const d = Math.floor(s / 86400); s %= 86400;
     const h = Math.floor(s / 3600); s %= 3600;
     const m = Math.floor(s / 60); s %= 60;
     const p = (n) => String(n).padStart(2, '0');
-    $('timer').innerHTML = `${d}d<i>:</i>${p(h)}<i>:</i>${p(m)}<i>:</i>${p(s)}`;
+    $('timer').innerHTML = `${d}d${DOT}${p(h)}${DOT}${p(m)}${DOT}${p(s)}`;
   }
   tickTimer(); setInterval(tickTimer, 1000);
 
   /* ---------------- Pendulum ---------------- */
-  // Damped pendulum around the rope anchor, plus a soft "breeze" so it never fully rests.
+  // Damped pendulum around the rope top, plus a soft "breeze" so it never fully rests.
   const pend = { a: 0, v: 0 };
-  const STIFF = 9, DAMP = 1.1, MAX_A = 0.38;
+  const STIFF = 9, DAMP = 1.1, MAX_A = 0.32;
   function kick(impulse) { pend.v += impulse; }
   function stepPendulum(dt, t) {
-    const breeze = reduceMotion ? 0 : Math.sin(t * 0.9) * 0.18 + Math.sin(t * 2.3) * 0.05;
+    const breeze = reduceMotion ? 0 : Math.sin(t * 0.9) * 0.16 + Math.sin(t * 2.3) * 0.04;
     const acc = -STIFF * Math.sin(pend.a) - DAMP * pend.v + breeze;
     pend.v += acc * dt;
     pend.a += pend.v * dt;
@@ -362,33 +434,18 @@
     swing.style.transform = `rotate(${pend.a}rad)`;
   }
 
-  /* Pinata size: fit the free space between the pool pill and the bottom block. */
-  function layoutPinata() {
-    const stage = $('stage').getBoundingClientRect();
-    const bottom = document.querySelector('.bottom-block').getBoundingClientRect();
-    // Rope runs from behind the pool pill down past the "today" line and progress bar.
-    const meta = document.querySelector('.pool-meta').getBoundingClientRect();
-    const rope = Math.max(34, meta.bottom - stage.top - 52 + 4);
-    $('rig').style.setProperty('--rope', rope + 'px');
-    const rigTop = 52 + rope;
-    const freeH = bottom.top - stage.top - rigTop - 12;
-    const w = Math.max(120, Math.min(215, freeH / 1.5538, stage.width * 0.6));
-    pinata.style.setProperty('--pw', w + 'px');
-  }
-  addEventListener('resize', layoutPinata);
-
   /* ---------------- Particles ---------------- */
   const parts = [];
   const appRect = () => app.getBoundingClientRect();
   function pinataCenter() {
     const r = pinataImg.getBoundingClientRect(), a = appRect();
-    return { x: r.left - a.left + r.width * 0.5, y: r.top - a.top + r.height * 0.55 };
+    return { x: r.left - a.left + r.width * 0.5, y: r.top - a.top + r.height * 0.5 };
   }
   function balanceTarget() {
     const r = $('balance').getBoundingClientRect(), a = appRect();
-    return { x: r.left - a.left + 10, y: r.top - a.top + r.height / 2 };
+    return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 };
   }
-  const PAPER = ['#a463ff', '#7b3fe4', '#ff3c6e', '#ff5fa2', '#c79bff', '#ffd23f'];
+  const PAPER = ['#a463ff', '#7b3fe4', '#fe0760', '#ff5fa2', '#c79bff', '#ffd23f'];
 
   function spawn(kind, x, y, opts) {
     const el = document.createElement('div');
@@ -405,12 +462,12 @@
       p.life += dt;
       let scale = 1, opacity = 1;
       if (p.homing && p.life > p.flyAt) {
-        // Phase 2: fly into the user's balance along an eased curve.
+        // Phase 2: fly into the balance in the claim card along an eased curve.
         if (!p.from) p.from = { x: p.x, y: p.y };
         const t = Math.min(1, (p.life - p.flyAt) / 0.55);
         const e = t * t * (3 - 2 * t);
         const tg = p.target;
-        const cx = (p.from.x + tg.x) / 2 + (p.from.x < tg.x ? -60 : 60), cy = Math.min(p.from.y, tg.y) - 80;
+        const cx = (p.from.x + tg.x) / 2 + (p.from.x < tg.x ? -60 : 60), cy = Math.min(p.from.y, tg.y) - 40;
         p.x = (1 - e) * (1 - e) * p.from.x + 2 * (1 - e) * e * cx + e * e * tg.x;
         p.y = (1 - e) * (1 - e) * p.from.y + 2 * (1 - e) * e * cy + e * e * tg.y;
         scale = 1 - e * 0.55;
@@ -461,7 +518,7 @@
     if (state.available < 0.01) {
       kick(dir * 0.9); squash();
       for (let i = 0; i < 6; i++) spawn('paper', c.x, c.y, { vx: (Math.random() - .5) * 260, vy: -Math.random() * 240, fade: 1.4 });
-      toast('Пусто 🙃 Сделай ставку — 15% от неё можно выбить из ламы');
+      toast('Пусто 🙃 Сделай ставку — 1.5% от неё можно выбить из ламы');
       return;
     }
 
@@ -472,10 +529,10 @@
     state.today += amount;
     save(); renderStatic();
 
-    kick(dir * 1.5); squash();
+    kick(dir * 1.4); squash();
     burstAt(c.x + (dir < 0 ? 40 : -40), c.y - 10);
-    popText(`+${fmt2(amount)} USDT`, c.x, c.y - 130);
-    pushTicker({ name: 'Ты', amount, me: true }, true);
+    popText(`+${fmt2(amount)} USDT`, c.x, c.y - 90);
+    pushRecent({ name: 'Ты', amount, me: true });
 
     const n = Math.round(Math.min(28, Math.max(8, 6 + Math.log2(amount + 1) * 3)));
     const per = amount / n;
@@ -504,9 +561,22 @@
   pinata.addEventListener('pointerdown', (e) => { const a = appRect(); hit(e.clientX - a.left); });
   $('hitBtn').addEventListener('click', () => hit(null));
 
+  /* ---------------- Recent rewards feed ---------------- */
+  const NAMES = ['khaled', 'ueyama', 'py1337', '25kings', 'alex', 'max_pro', 'kriptoboss', 'dimon', 'luckyKate', 'sasha77', 'whale', 'neo', 'igor', 'mila', 'betking', 'zhenya', 'degen42'];
+  const mask = (s) => s.slice(0, 3) + '...';
+  const randName = () => mask(NAMES[(Math.random() * NAMES.length) | 0]);
+  const recent = $('recent');
+  const USDT = '<img src="assets/v3/usdt.svg" alt="">';
+  function pushRecent({ name, amount, me }) {
+    const li = document.createElement('li');
+    li.className = 'chip' + (me ? ' me' : '');
+    li.innerHTML = `<span class="who">${name}</span>${USDT}<b>${fmt2(amount)}</b>`;
+    recent.prepend(li);
+    while (recent.children.length > 4) recent.lastElementChild.remove();
+  }
+  [['25k...', 4.12], ['py1...', 14.12], ['uey...', 14.12], ['kha...', 14.12]].forEach(([name, amount]) => pushRecent({ name, amount }));
+
   /* ---------------- Other players looting (FOMO) ---------------- */
-  const NAMES = ['alex', 'max_pro', 'kriptoboss', 'dimon', 'luckyKate', 'sasha77', 'whale', 'neo', 'igor', 'mila', 'betking', 'zhenya', 'tony', 'ruslan', 'vika', 'degen42'];
-  const mask = (s) => s.length <= 3 ? s[0] + '***' : s.slice(0, 3) + '***' + s.slice(-1);
   function randomClaim() {
     // Long-tailed: most claims are small, some whales.
     const r = Math.random();
@@ -517,7 +587,7 @@
       const amount = Math.min(randomClaim(), state.pool);
       state.pool -= amount; state.today += amount;
       save(); renderStatic();
-      pushTicker({ name: mask(NAMES[(Math.random() * NAMES.length) | 0]), amount });
+      pushRecent({ name: randName(), amount });
       // Someone else's stick hits the llama: small kick and a few coins fall away (not to you).
       kick((Math.random() < .5 ? -1 : 1) * (0.25 + Math.min(0.5, amount / 600)));
       const c = pinataCenter();
@@ -530,45 +600,36 @@
     setTimeout(otherHit, 900 + Math.random() * 2200);
   }
 
-  /* ---------------- Ticker (JS marquee so new items append without jumps) ---------------- */
-  const track = $('ticker');
-  let tickerX = 0;
-  function tickerItem({ name, amount, me }) {
-    const el = document.createElement('span');
-    el.className = 'ticker-item' + (me ? ' me' : '');
-    el.innerHTML = `${me ? '🎉' : '🔥'} ${name} ${me ? 'выбил' : 'выбил'} <em>${fmt2(amount)} USDT</em>`;
-    return el;
+  /* ---------------- Games grid + tabs ---------------- */
+  const grid = $('grid');
+  // Slots follow the Figma frame order (Sweet Bonanza appears twice there). Other tabs are demo shuffles.
+  const order = { slots: [1, 2, 3, 2, 5, 6, 7, 8, 4, 10, 12, 11], esports: [8, 3, 11, 6, 1, 10, 4, 12, 7, 9, 2, 5], sports: [5, 12, 9, 2, 7, 1, 11, 3, 10, 6, 8, 4] };
+  const favs = new Set();
+  function renderGames(tab) {
+    grid.innerHTML = order[tab].map((n) => `
+      <div class="game"><img src="assets/v3/games/g${n}.jpg" alt="" loading="lazy">
+        <span class="new">New</span>
+        <button class="fav${favs.has(n) ? ' on' : ''}" data-g="${n}" aria-label="В избранное"><img src="assets/v3/heart.svg" alt=""></button>
+      </div>`).join('');
+    $('viewAll').textContent = `View all ${tab} →`;
   }
-  const pending = [];
-  function pushTicker(item, priority) {
-    if (priority) {
-      // Put the user's own win right at the visible edge.
-      const el = tickerItem(item);
-      const w = track.parentElement.clientWidth;
-      let insertBefore = null;
-      for (const child of track.children) { if (child.offsetLeft + tickerX > w * 0.25) { insertBefore = child; break; } }
-      track.insertBefore(el, insertBefore);
-    } else pending.push(item);
-  }
-  function stepTicker(dt) {
-    const w = track.parentElement.clientWidth;
-    tickerX -= dt * 42;
-    // Recycle items that scrolled off the left edge.
-    const first = track.firstElementChild;
-    if (first && first.offsetLeft + first.offsetWidth + tickerX < 0) {
-      const shift = first.offsetWidth + 28;
-      first.remove(); tickerX += shift;
-    }
-    // Keep the track filled to the right.
-    while (track.scrollWidth + tickerX < w * 2) {
-      const item = pending.shift() || { name: mask(NAMES[(Math.random() * NAMES.length) | 0]), amount: randomClaim() };
-      track.appendChild(tickerItem(item));
-    }
-    track.style.transform = `translateX(${tickerX}px)`;
-  }
+  grid.addEventListener('click', (e) => {
+    const b = e.target.closest('.fav'); if (!b) return;
+    const n = Number(b.dataset.g);
+    favs.has(n) ? favs.delete(n) : favs.add(n);
+    b.classList.toggle('on', favs.has(n));
+  });
+  $('seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $('seg').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    renderGames(b.dataset.tab);
+  });
+  renderGames('slots');
 
   /* ---------------- Rules sheet + demo bets ---------------- */
-  $('helpBtn').addEventListener('click', () => app.classList.add('open'));
+  const openSheet = () => app.classList.add('open');
+  $('helpBtn').addEventListener('click', openSheet);
+  $('rulesBtn').addEventListener('click', openSheet);
   $('sheetBg').addEventListener('click', () => app.classList.remove('open'));
   document.querySelectorAll('[data-bet]').forEach((b) => b.addEventListener('click', () => {
     const bet = Number(b.dataset.bet);
@@ -586,13 +647,11 @@
     const dt = Math.min(0.033, (now - last) / 1000); last = now;
     stepPendulum(dt, now / 1000);
     stepParticles(dt);
-    stepTicker(dt);
     renderTween(dt);
     requestAnimationFrame(frame);
   }
 
   renderStatic();
-  layoutPinata();
   requestAnimationFrame(frame);
   setTimeout(otherHit, 1200);
 })();
