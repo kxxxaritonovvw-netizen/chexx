@@ -149,12 +149,12 @@
   @keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.06, .93); } 60% { transform: scale(.97, 1.04); } 100% { transform: scale(1); } }
   .pinata-hit.empty img { filter: grayscale(.85) brightness(.7); }
 
-  /* Recent rewards: live feed of five two-line chips, 16px from the left edge. */
+  /* Recent rewards: live feed of five two-line chips, 16px from the left edge.
+     New chips drop in from the top and push the rest down; see pushRecent(). */
   .recent { position: absolute; left: 16px; top: 145px; z-index: 3; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
   .chip {
     display: flex; flex-direction: column; padding: 4px 6px; border-radius: 12px;
     background: rgba(0,0,0,.64); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); white-space: nowrap;
-    animation: chipIn .25s ease-out;
   }
   .chip .who { font-size: 10px; line-height: 10px; margin-bottom: 2px; font-weight: 600; color: var(--text-secondary); max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
   .chip .amt { display: flex; align-items: center; gap: 4px; }
@@ -162,7 +162,6 @@
   .chip b { font-size: 12px; line-height: 14px; font-weight: 700; }
   .chip.me { background: rgba(47,210,122,.28); }
   .chip.me .who, .chip.me b { color: var(--green); }
-  @keyframes chipIn { from { opacity: .3; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
 
   /* "1.5% BET ROYALTY" block, 16px from the right edge. */
   .rake {
@@ -315,11 +314,27 @@
   .sheet h2 { font-family: var(--font-wide); font-size: 18px; margin: 0 0 12px; }
   .sheet ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); }
   .sheet ol b { color: #fff; }
-  .demo { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
-  .demo .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
-  .demo .row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .demo button { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 600; }
-  .demo button:active { background: rgba(255,255,255,.16); }
+  /* ---------- Demo settings panel: desktop with a mouse only, never on phones ---------- */
+  .demo-panel { display: none; }
+  @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+    .demo-panel {
+      position: fixed; left: 24px; top: 24px; z-index: 100; width: 240px; padding: 16px; border-radius: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+      background: rgba(34,27,45,.92); border: 1px solid rgba(243,235,255,.08); box-shadow: 0 12px 40px rgba(0,0,0,.4);
+      font-size: 13px; line-height: 16px; user-select: none; -webkit-user-select: none;
+    }
+  }
+  .dp-head { font-size: 14px; font-weight: 700; }
+  .dp-label { margin-bottom: -6px; font-size: 12px; color: var(--text-secondary); }
+  .dp-states { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; padding: 2px; border-radius: 12px; background: var(--bg-base); }
+  .dp-states button { height: 36px; border-radius: 10px; font-weight: 600; color: var(--text-secondary); transition: background .15s, color .15s; }
+  .dp-states button:hover { color: #fff; }
+  .dp-states button.on { background: var(--brand); color: #fff; }
+  .dp-bets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .dp-bets button, .dp-reset { height: 36px; border-radius: 10px; background: rgba(243,235,255,.12); font-weight: 600; transition: background .15s; }
+  .dp-bets button:hover, .dp-reset:hover { background: rgba(243,235,255,.2); }
+  .dp-bets button:active, .dp-reset:active { transform: scale(.98); }
+  .dp-note { font-size: 11px; line-height: 14px; color: var(--text-tertiary); }
 
   /* ---------- Empty pool ---------- */
   .ended {
@@ -462,18 +477,22 @@
       <li>Жми «Claim» или бей по ламе — монеты летят прямо на твой баланс.</li>
       <li>Другие игроки тоже бьют. <b>Пул тает на глазах</b> — когда он кончится или выйдет время, рейкбек больше не выбить.</li>
     </ol>
-    <div class="demo">
-      <div class="label">Демо: сделать ставку (начислится 1.5%)</div>
-      <div class="row">
-        <button data-bet="100">Казино $100</button>
-        <button data-bet="500">Спорт $500</button>
-        <button data-bet="5000">Слоты $5 000</button>
-        <button id="guestBtn">Гостевой режим</button>
-        <button id="resetBtn">Сбросить демо</button>
-      </div>
-    </div>
   </section>
 </div>
+
+<aside class="demo-panel" id="demoPanel" aria-label="Настройки демо">
+  <div class="dp-head">Настройки демо</div>
+  <div class="dp-label">Состояние экрана</div>
+  <div class="dp-states" id="dpStates">
+    <button data-auth="1" class="on">Клейм</button><button data-auth="0">Гость</button>
+  </div>
+  <div class="dp-label">Сделать ставку (начислится 1.5%)</div>
+  <div class="dp-bets">
+    <button data-bet="100">$100</button><button data-bet="500">$500</button><button data-bet="5000">$5 000</button>
+  </div>
+  <button class="dp-reset" id="resetBtn">Сбросить демо</button>
+  <div class="dp-note">Панель видна только на десктопе. На телефоне открывается чистая мобильная версия.</div>
+</aside>
 
 <script>
 (() => {
@@ -489,7 +508,7 @@
   /* ---------------- State ---------------- */
   const defaults = () => ({
     pool: POOL_TOTAL - 18_432.17,         // some already looted before the user arrived
-    authed: true,                         // member by default; the rules sheet has a guest switch
+    authed: true,                         // claim case by default; the desktop panel switches to guest
     available: 14.12,                     // user's claimable rakeback
     balance: 29.2,
     endsAt: Date.now() + ((39 * 24 + 23) * 3600 + 56 * 60 + 57) * 1000,
@@ -507,6 +526,7 @@
   function renderStatic() {
     $('avail').textContent = fmt2(state.available);
     $('card').classList.toggle('authed', !!state.authed);
+    document.querySelectorAll('#dpStates button').forEach((b) => b.classList.toggle('on', (b.dataset.auth === '1') === !!state.authed));
     const btn = $('hitBtn');
     if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Pool is empty'; }
     else { btn.disabled = false; btn.textContent = 'Claim now'; btn.classList.toggle('idle', state.available < 0.01); }
@@ -695,14 +715,27 @@
   const randName = () => NAMES[(Math.random() * NAMES.length) | 0];
   const recent = $('recent');
   const USDT = '<img src="assets/v3/usdt.svg" alt="">';
-  function pushRecent({ name, amount, me }) {
+  const RECENT_MAX = 5;
+  function pushRecent({ name, amount, me, instant }) {
     const li = document.createElement('li');
     li.className = 'chip' + (me ? ' me' : '');
     li.innerHTML = `<span class="who">${name}</span><span class="amt">${USDT}<b>${fmt2(amount)}</b></span>`;
     recent.prepend(li);
-    while (recent.children.length > 5) recent.lastElementChild.remove();
+    const live = [...recent.children].filter((el) => !el.dataset.out);
+    const extra = live.slice(RECENT_MAX);
+    if (instant || reduceMotion || !li.animate) { extra.forEach((el) => el.remove()); return; }
+    // The whole column slides down by one row while the new chip fades in and the oldest fades out.
+    const shift = li.offsetHeight + 4;
+    const slide = { duration: 480, easing: 'cubic-bezier(.22,.8,.24,1)' };
+    [...recent.children].forEach((el) => el.animate([{ transform: `translateY(${-shift}px)` }, { transform: 'none' }], slide));
+    li.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 480, easing: 'ease-out' });
+    extra.forEach((el) => {
+      el.dataset.out = '1';
+      el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+      setTimeout(() => el.remove(), 320); // a timer, not onfinish: animations stall in a hidden tab
+    });
   }
-  [['mila', 5.4], ['sasha77', 3.76], ['dimon', 8.82], ['ueyama', 16.34], ['kharitonov', 14.12]].forEach(([name, amount]) => pushRecent({ name, amount }));
+  [['mila', 5.4], ['sasha77', 3.76], ['dimon', 8.82], ['ueyama', 16.34], ['kharitonov', 14.12]].forEach(([name, amount]) => pushRecent({ name, amount, instant: true }));
 
   /* ---------------- Other players looting (FOMO) ---------------- */
   function randomClaim() {
@@ -769,7 +802,7 @@
     const q = e.target.closest('.q'); if (q) q.parentElement.classList.toggle('open');
   });
 
-  /* ---------------- Rules sheet + demo bets ---------------- */
+  /* ---------------- Rules sheet + desktop demo panel ---------------- */
   const openSheet = () => app.classList.add('open');
   $('helpBtn').addEventListener('click', openSheet);
   $('rulesBtn').addEventListener('click', openSheet);
@@ -780,7 +813,10 @@
     app.classList.remove('open');
     toast(`Ставка $${bet.toLocaleString('ru-RU')} → +${fmt2(bet * RAKEBACK)} USDT к выбиванию`);
   }));
-  $('guestBtn').addEventListener('click', () => { state.authed = false; save(); renderStatic(); app.classList.remove('open'); });
+  $('dpStates').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.authed = b.dataset.auth === '1'; save(); renderStatic();
+  });
   $('resetBtn').addEventListener('click', () => {
     state = defaults(); shown.pool = state.pool; shown.balance = state.balance; save(); renderStatic(); app.classList.remove('open');
   });
