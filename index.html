@@ -133,6 +133,9 @@
     content: ""; position: absolute; inset: 0 8.5px; z-index: -2; border-radius: 0 0 10px 10px;
     -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   }
+  /* Claimed coins land here: the tab bumps on every coin. */
+  .collected.pulse { animation: collectedPulse .3s ease-out; }
+  @keyframes collectedPulse { 40% { transform: scale(1.14); } }
   .collected span { color: var(--text-secondary); }
   .collected b { font-weight: 700; font-variant-numeric: tabular-nums; }
 
@@ -160,7 +163,8 @@
   .chip .amt { display: flex; align-items: center; gap: 4px; }
   .chip img { width: 12px; height: 12px; }
   .chip b { font-size: 12px; line-height: 14px; font-weight: 700; }
-  .chip.me { background: rgba(47,210,122,.28); }
+  /* Your own claim: the usual black layer with translucent green on top, so the text stays readable over the glow. */
+  .chip.me { background: linear-gradient(rgba(47,210,122,.28), rgba(47,210,122,.28)), rgba(0,0,0,.64); }
   .chip.me .who, .chip.me b { color: var(--green); }
 
   /* "1.5% BET ROYALTY" block, 16px from the right edge. */
@@ -274,8 +278,6 @@
   .nav a.active { color: #fff; }
   .nav a > img.dot { z-index: 1; width: 6px; height: 6px; left: calc(50% + 9px); top: 6px; }
   .nav a.center > img { width: 44px; height: 44px; top: -18px; object-fit: cover; }
-  .nav a.pulse > img:not(.dot) { animation: walletPulse .3s ease-out; }
-  @keyframes walletPulse { 40% { transform: translateX(-50%) scale(1.25); } }
 
   /* ---------- FX layer ---------- */
   #fx { position: absolute; inset: 0; pointer-events: none; z-index: 20; overflow: hidden; }
@@ -356,9 +358,11 @@
     .main { padding: calc(48px + env(safe-area-inset-top)) 0 calc(64px + env(safe-area-inset-bottom)); }
   }
 
+  /* Desktop / tablet: the phone demo is an exact 360×720 frame. */
   @media (min-width: 431px) {
-    body { display: grid; place-items: center; }
-    .app { height: min(100dvh, 860px); border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+    html, body { overflow: auto; }
+    body { display: grid; place-items: center; min-height: 100%; }
+    .app { width: 360px; max-width: none; height: 720px; flex: none; border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
   }
 </style>
 </head>
@@ -577,10 +581,10 @@
     const r = pinataImg.getBoundingClientRect(), a = appRect();
     return { x: r.left - a.left + r.width * 0.5, y: r.top - a.top + r.height * 0.5 };
   }
-  // Claimed coins fly into the wallet: the Profile tab in the bottom nav.
-  const wallet = $('wallet');
+  // Claimed coins fly into the "Collected" tab under the pool badge.
+  const collectedTab = $('collected').parentElement;
   function balanceTarget() {
-    const r = wallet.querySelector('img:not(.dot)').getBoundingClientRect(), a = appRect();
+    const r = collectedTab.getBoundingClientRect(), a = appRect();
     return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 };
   }
   const PAPER = ['#a463ff', '#7b3fe4', '#fe0760', '#ff5fa2', '#c79bff', '#ffd23f'];
@@ -601,7 +605,7 @@
       p.life += dt;
       let scale = 1, opacity = 1;
       if (p.homing && p.life > p.flyAt) {
-        // Phase 2: fly into the balance in the claim card along an eased curve.
+        // Phase 2: fly into the Collected tab along an eased curve.
         if (!p.from) p.from = { x: p.x, y: p.y };
         const t = Math.min(1, (p.life - p.flyAt) / 0.55);
         const e = t * t * (3 - 2 * t);
@@ -682,7 +686,7 @@
         homing: true, flyAt: 0.35 + Math.random() * 0.35, target,
         onArrive: () => {
           arrived++;
-          wallet.classList.remove('pulse'); void wallet.offsetWidth; wallet.classList.add('pulse');
+          collectedTab.classList.remove('pulse'); void collectedTab.offsetWidth; collectedTab.classList.add('pulse');
           if (arrived === n) { claiming = false; renderStatic(); }
         },
       });
