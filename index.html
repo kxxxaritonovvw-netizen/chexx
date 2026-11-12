@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#110c18">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Kopilka USDT</title>
+<title>$1M USDT Pool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
@@ -51,11 +51,11 @@
   .header .icon img { width: 20px; height: 20px; }
   .header .back { left: 6px; }
   .header .help { right: 6px; }
-  .header .title { position: absolute; left: 50%; bottom: 7px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; white-space: nowrap; }
+  .header .title { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; white-space: nowrap; }
   .header h1 { margin: 0; font-family: var(--font-wide); font-weight: 700; font-size: 16px; letter-spacing: -.32px; text-transform: uppercase; }
-  .timer-row { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 14px; font-weight: 600; color: var(--text-secondary); }
-  .timer-row .clock { width: 12px; height: 12px; opacity: .64; }
-  .timer { display: flex; align-items: center; font-variant-numeric: tabular-nums; }
+  .timer-row { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 14px; font-weight: 500; color: var(--text-secondary); }
+  .timer-row .clock { width: 14px; height: 14px; }
+  .timer { display: flex; align-items: center; color: #fff; font-variant-numeric: tabular-nums; }
   .timer i { width: 6px; height: 14px; display: grid; place-items: center; }
   .timer i img { width: 2px; height: 6px; }
 
@@ -63,97 +63,152 @@
   .main { position: relative; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; }
   .main::-webkit-scrollbar { display: none; }
 
-  /* ---------- Hero (375px, its glow runs on to 572px behind the card) ---------- */
-  .hero { position: relative; height: 375px; }
+  /* ---------- Hero: 347px to the card's top edge; its glow runs on behind the card ---------- */
+  .hero { position: relative; height: 347px; }
   .hero-bg {
-    position: absolute; left: 0; right: 0; top: 0; height: 572px; pointer-events: none;
-    background: radial-gradient(232px 275.68px at 50% 275.68px,
-      #7f00ff 0%, #6300c4 24.9%, #47008a 49.8%, #31006b 59.7%, #1b004d 69.7%, #160633 84.8%, #110c18 100%);
+    position: absolute; left: 0; right: 0; top: 1px; height: 544px; pointer-events: none;
+    background: radial-gradient(443.29px 262.19px at 50% 262.19px,
+      #7f00ff 0%, #6300c4 24.878%, #47008a 49.757%, #31006b 59.706%, #1b004d 69.655%, #160633 84.827%, #110c18 100%);
   }
   .rays {
-    position: absolute; top: -27.29px; left: 50%; width: 360px; height: 404.6px; transform: translateX(-50%); pointer-events: none;
-    background: url(assets/v2/rays.jpg) center/cover no-repeat; opacity: .07; mix-blend-mode: plus-lighter;
-    -webkit-mask-image: radial-gradient(372.9px 181px at 50% 206.2px, #000 51%, transparent 100%);
-            mask-image: radial-gradient(372.9px 181px at 50% 206.2px, #000 51%, transparent 100%);
+    position: absolute; top: -26.36px; left: calc(50% - 178px); width: 357.05px; height: 404.624px; pointer-events: none;
+    background: url(assets/v2/rays.jpg) center/cover no-repeat; opacity: .0708; mix-blend-mode: plus-lighter;
+    -webkit-mask: url(assets/v4/rays-mask.svg) -2.004px 43.285px / 360.007px 416px no-repeat;
+            mask: url(assets/v4/rays-mask.svg) -2.004px 43.285px / 360.007px 416px no-repeat;
   }
   /* Centre pieces are laid out on the 360px design grid. */
   .grid360 { position: absolute; top: 0; left: 50%; width: 360px; height: 100%; margin-left: -180px; }
 
-  /* Green "Left in piniatta" badge */
-  .pool-wrap { position: absolute; top: 8px; left: calc(50% + .28px); transform: translateX(-50%); z-index: 4; width: 212px; height: 55.4px; display: flex; align-items: center; justify-content: center; }
+  /* Light pooled under the llama: three blurred ellipses, each cut by the same soft mask.
+     Mask offsets are the Figma ones mirrored through the box centre: the boxes are turned 153deg. */
+  .underglow { position: absolute; left: 0; top: 40.93px; width: 360px; height: 474px; pointer-events: none; }
+  /* --cut ends each layer 100px below the hero, safely behind the card, as in the mockup; clipping the blended layer itself keeps the blend. */
+  .underglow > div { position: absolute; display: flex; align-items: center; justify-content: center; mix-blend-mode: plus-lighter; clip-path: inset(-120px -120px var(--cut) -120px); }
+  .underglow > div > div { flex: none; transform: rotate(153.49deg) skewX(-.94deg); }
+  .underglow i {
+    display: block; position: relative;
+    -webkit-mask: url(assets/v4/glow-mask.svg) var(--mp) / 302.016px 363.977px no-repeat;
+            mask: url(assets/v4/glow-mask.svg) var(--mp) / 302.016px 363.977px no-repeat;
+    -webkit-mask-clip: no-clip; mask-clip: no-clip;
+  }
+  .underglow img { position: absolute; max-width: none; }
+  .underglow .ga { left: 33.99px; top: 278.18px; width: 253.98px; height: 238.317px; --cut: 110.43px; }
+  .underglow .ga i { width: 205.422px; height: 162.549px; --mp: -79.436px -51.269px; }
+  .underglow .ga img { left: -17.14%; top: -21.66%; }
+  .underglow .gb { left: 27.91px; top: 250.12px; width: 288.597px; height: 283.622px; --cut: 127.67px; }
+  .underglow .gb i { width: 224.414px; height: 203.375px; --mp: -66.527px -38.502px; }
+  .underglow .gb img { left: -15.69%; top: -17.31%; }
+  .underglow .gc { left: 11.15px; top: 234.48px; width: 334.116px; height: 308.495px; mix-blend-mode: color; --cut: 136.9px; }
+  .underglow .gc i { width: 273.759px; height: 206.533px; --mp: -33.937px -50.981px; }
+  .underglow .gc img { left: -12.86%; top: -17.05%; }
+
+  /* Green "Left in the piñata" badge with the "Collected" tab hanging under it, both tilted -2deg. */
+  .pool-wrap { position: absolute; top: 12.06px; left: calc(50% - .5px); transform: translateX(-50%); z-index: 4; width: 224.311px; height: 77.791px; display: flex; align-items: center; justify-content: center; }
+  .pool-stack { flex: none; transform: rotate(-2deg); display: flex; flex-direction: column; align-items: center; isolation: isolate; }
   .pool {
-    position: relative; transform: rotate(-2deg); height: 48.086px; padding: 0 12px 0 32px; border-radius: 16px;
-    display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 8px;
+    position: relative; z-index: 2; height: 48.086px; min-width: 220px; padding: 0 12px; border-radius: 16px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px;
     background: linear-gradient(90deg, #00431f, #00873f);
+    box-shadow: 0 2px 4px rgba(0,0,0,.25), 0 1px 0 #004430, inset 0 4.653px 27.921px rgba(255,255,255,.24);
     font-family: var(--font-wide); font-weight: 700; text-transform: uppercase; white-space: nowrap; transition: filter .3s;
   }
   .pool .ttl { font-size: 10px; letter-spacing: -.2px; color: var(--text-secondary); }
-  .pool .value { font-size: 22px; letter-spacing: -.44px; font-variant-numeric: tabular-nums; }
-  .pool .coin {
-    position: absolute; left: 5.3px; top: calc(50% - 1.66px); width: 47.282px; height: 53.476px; object-fit: cover;
-    transform: translate(-50%, -50%) rotate(-20.26deg);
-    filter: drop-shadow(0 7px 7px rgba(0,0,0,.5)) drop-shadow(0 0 12px #00412e);
-  }
+  .pool .value { font-size: 24px; letter-spacing: -.48px; font-variant-numeric: tabular-nums; }
   .pool.low { filter: hue-rotate(-130deg) saturate(1.4); }
   .pool .delta {
     position: absolute; left: calc(100% + 6px); top: 14px; font-family: var(--font); font-size: 12px; font-weight: 700; color: #ff7aa8;
     text-transform: none; pointer-events: none; animation: deltaUp 1.1s ease-out forwards;
   }
   @keyframes deltaUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-16px); } }
-
-  /* "За сегодня уже забрали N USDT" */
-  .today { position: absolute; top: 76.1px; left: calc(50% - 3.28px); transform: translate(-50%, -50%) rotate(-2deg); z-index: 4; display: flex; gap: 6px; white-space: nowrap; font-size: 14px; line-height: 16px; }
-  .today span { color: var(--text-secondary); font-weight: 500; }
-  .today b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .collected {
+    position: relative; z-index: 1; height: 22px; min-width: 138.959px; padding: 4px 19.5px 0;
+    display: flex; justify-content: center; gap: 4px; white-space: nowrap; font-size: 12px; line-height: 14px;
+  }
+  /* The tab shape is the Figma vector; its flared corners stay fixed while the middle stretches with the number. */
+  .collected::before {
+    content: ""; position: absolute; inset: 0 -10.87px -1px; z-index: -1;
+    border: solid transparent; border-width: 0 30px; border-image: url(assets/v4/collected-pill.svg) 0 30 fill / 0 30px stretch;
+  }
+  .collected::after {
+    content: ""; position: absolute; inset: 0 8.5px; z-index: -2; border-radius: 0 0 10px 10px;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .collected span { color: var(--text-secondary); }
+  .collected b { font-weight: 700; font-variant-numeric: tabular-nums; }
 
   /* Llama on its rope. #swing rotates around the rope's top. */
-  .rig { position: absolute; top: 73.35px; left: calc(50% - 14.67px - 126.33px); width: 252.67px; height: 252.67px; z-index: 2; }
+  .rig { position: absolute; top: 82.93px; left: calc(50% - 12.16px - 128.323px); width: 256.646px; height: 256.646px; z-index: 2; }
   #swing { position: absolute; inset: 0; transform-origin: 55.5% 0; will-change: transform; }
   .pinata-hit { position: absolute; inset: 0; cursor: pointer; touch-action: none; }
   .pinata-hit img {
     width: 100%; height: 100%; object-fit: cover; pointer-events: none; transform-origin: 55% 30%;
-    -webkit-mask: linear-gradient(#000 197.8px, rgba(0,0,0,.6) 210px, rgba(0,0,0,.15) 220px, transparent 226px) top / 100% 226px no-repeat;
-            mask: linear-gradient(#000 197.8px, rgba(0,0,0,.6) 210px, rgba(0,0,0,.15) 220px, transparent 226px) top / 100% 226px no-repeat;
+    -webkit-mask: url(assets/v4/llama-mask.svg) -62.469px 0 / 365.668px 229.559px no-repeat;
+            mask: url(assets/v4/llama-mask.svg) -62.469px 0 / 365.668px 229.559px no-repeat;
   }
   .pinata-hit img.squash { animation: squash .28s ease-out; }
   @keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.06, .93); } 60% { transform: scale(.97, 1.04); } 100% { transform: scale(1); } }
   .pinata-hit.empty img { filter: grayscale(.85) brightness(.7); }
 
-  /* Recent rewards: live feed, pinned 16px from the left edge (centre at y 261 in the hero). */
-  .recent { position: absolute; left: 16px; top: 195px; width: 88px; z-index: 3; display: flex; flex-direction: column; gap: 8px; }
-  .recent .head { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 12px; font-weight: 600; }
-  .recent .head img { width: 16px; height: 16px; flex: none; }
-  .recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; height: 100px; }
+  /* Recent rewards: live feed of five two-line chips, 16px from the left edge. */
+  .recent { position: absolute; left: 16px; top: 145px; z-index: 3; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
   .chip {
-    align-self: flex-start; display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: 12px;
+    display: flex; flex-direction: column; padding: 4px 6px; border-radius: 12px;
     background: rgba(0,0,0,.64); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); white-space: nowrap;
     animation: chipIn .25s ease-out;
   }
-  .chip .who { font-size: 10px; line-height: 10px; font-weight: 600; color: var(--text-secondary); }
+  .chip .who { font-size: 10px; line-height: 10px; margin-bottom: 2px; font-weight: 600; color: var(--text-secondary); max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
+  .chip .amt { display: flex; align-items: center; gap: 4px; }
   .chip img { width: 12px; height: 12px; }
-  .chip b { font-size: 12px; line-height: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chip b { font-size: 12px; line-height: 14px; font-weight: 700; }
   .chip.me { background: rgba(47,210,122,.28); }
   .chip.me .who, .chip.me b { color: var(--green); }
   @keyframes chipIn { from { opacity: .3; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
 
-  /* ---------- Claim card: 328×160, overlaps the hero bottom by 32px ---------- */
-  .card {
-    position: relative; z-index: 4; margin: -32px 16px 0; height: 160px; border-radius: 24px; background: var(--bg-base);
-    padding: 16px 16px 12px; display: flex; flex-direction: column;
+  /* "1.5% BET ROYALTY" block, 16px from the right edge. */
+  .rake {
+    position: absolute; right: 16px; top: 252.79px; z-index: 3; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
   }
-  .card .row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .card .label { font-size: 12px; line-height: 14px; font-weight: 700; }
-  .card .label span { color: var(--text-secondary); font-weight: 500; }
-  .card .rules { font-size: 12px; line-height: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
-  .card .avail { margin-top: 12px; display: flex; align-items: baseline; gap: 6px; }
-  .card .avail b { font-family: var(--font-wide); font-weight: 700; font-size: 26px; letter-spacing: -.52px; font-variant-numeric: tabular-nums; }
-  .card .avail small { font-size: 14px; line-height: 16px; font-weight: 500; color: var(--text-secondary); }
-  .meta { margin-top: 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 12px; line-height: 14px; color: var(--text-secondary); font-weight: 500; }
-  .meta b { color: #fff; font-weight: 600; font-variant-numeric: tabular-nums; transition: color .2s; }
-  .meta .bal.pulse b { color: var(--green); }
-  .bar { flex: none; width: 40px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.14); overflow: hidden; }
-  .bar > span { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--brand), #ffb84d); border-radius: 4px; transition: width .6s ease; }
-  .meta .sep { flex: 1; }
+  .rake .top { width: 90.534px; display: flex; flex-direction: column; gap: 8px; }
+  .rake .pct { font-family: var(--font-wide); font-weight: 700; font-size: 28.218px; letter-spacing: -.5644px; }
+  .rake .tag {
+    height: 11.317px; padding-left: 5.28px; border-radius: 122px; background: #fff; color: #6a06cc; display: flex; align-items: center; overflow: hidden;
+    font-family: var(--font-wide); font-weight: 700; font-size: 7.922px; letter-spacing: -.1584px; text-transform: uppercase; white-space: nowrap;
+  }
+  .rake p { margin: 0; width: 109.848px; text-align: center; font-size: 10px; line-height: 10px; font-weight: 600; }
+
+  /* ---------- Card: 328×152 at 360px (shorter when the text fits one line), right under the hero. Guests see log in / sign up, members the claim. ---------- */
+  .card {
+    position: relative; z-index: 4; margin: 0 16px; min-height: 132px; border-radius: 16px; padding: 16px;
+    box-shadow: 0 24px 20px rgba(0,0,0,.4);
+    background:
+      linear-gradient(33.387deg, rgba(34,27,45,0) 62.799%, rgba(254,7,96,.24) 93.377%),
+      linear-gradient(-24.85deg, rgba(34,27,45,0) 60.21%, rgba(254,7,96,.24) 91.161%),
+      var(--bg-base);
+  }
+  .card h3 {
+    margin: 0; height: 20px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-wide); font-weight: 700; font-size: 12px; letter-spacing: -.24px; text-transform: uppercase; white-space: nowrap;
+  }
+  .card .guest { display: flex; flex-direction: column; gap: 12px; }
+  .card .guest .txt { display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
+  .card .guest p { margin: 0; text-align: center; font-size: 14px; line-height: 20px; font-weight: 400; }
+  .card .btns { display: flex; gap: 8px; }
+  .btn { flex: 1 1 0; min-width: 0; height: 40px; padding: 10px 16px; border-radius: 10px; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; transition: transform .08s; }
+  .btn:active { transform: scale(.98); }
+  .btn.ghost { background: rgba(243,235,255,.16); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .btn.primary { background: var(--brand); }
+  /* Member state (after log in): claimable amount and the claim button. */
+  .card .member { display: none; height: 120px; flex-direction: column; align-items: center; }
+  .card.authed { background: radial-gradient(45% 90px at 50% 0, var(--bg-base) 40%, rgba(17,12,24,0) 100%), linear-gradient(180deg, #19332f 0, #121f25 50px, var(--bg-base) 90px); }
+  .card.authed .guest { display: none; }
+  .card.authed .member { display: flex; }
+  .card .avail { margin: 12px 0 0 2px; height: 24px; display: flex; align-items: center; gap: 8px; font-size: 24px; line-height: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .card .avail i { position: relative; flex: none; width: 24px; height: 24px; }
+  .card .avail i img {
+    position: absolute; left: 50%; top: calc(50% - 1.4px); width: 35.3px; height: 35.3px; max-width: none;
+    transform: translate(-50%, -50%) rotate(-5deg); filter: drop-shadow(0 3px 4px rgba(0,0,0,.5));
+  }
   .hit-btn {
     margin-top: auto; height: 40px; width: 100%; border-radius: 10px; background: var(--brand);
     font-size: 14px; line-height: 20px; font-weight: 600; transition: transform .08s, opacity .2s;
@@ -162,9 +217,16 @@
   .hit-btn.idle { opacity: .55; } /* nothing to claim yet, still tappable */
   .hit-btn:disabled { background: rgba(255,255,255,.1); color: var(--text-secondary); cursor: default; }
 
+  /* ---------- Scroll hint: three green chevrons on a soft green glow ---------- */
+  .hint { position: relative; height: 85px; margin: 0 16px; pointer-events: none; }
+  .hint img { position: absolute; max-width: none; }
+  .hint .glow { left: calc(50% + .5px - 250.5px); top: calc(50% - 142.5px); }
+  .hint .chev { left: calc(50% - 24.418px); top: 22.39px; }
+
   /* ---------- Games: heading · tabs · 3×4 grid · view all ---------- */
-  .games { position: relative; z-index: 1; margin: 84px 16px 0; padding-bottom: 32px; display: flex; flex-direction: column; gap: 16px; }
-  .games h2 { margin: 0; text-align: center; font-family: var(--font-wide); font-weight: 700; font-size: 14px; line-height: 16px; letter-spacing: -.28px; text-transform: uppercase; }
+  .games { position: relative; z-index: 1; margin: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+  .games h2 { margin: 0 0 -.3px; text-align: center; font-family: var(--font-wide); font-weight: 700; font-size: 14px; line-height: 16px; letter-spacing: -.28px; text-transform: uppercase; transform: rotate(-1deg); }
+  .games h2 em { font-style: normal; color: var(--brand); }
   .seg { display: flex; min-height: 40px; padding: 2px; border-radius: 12px; background: var(--bg-primary); }
   .seg button {
     position: relative; flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 12px; border-radius: 8px;
@@ -186,6 +248,20 @@
   .game .fav.on { background: var(--brand); }
   .view-all { height: 40px; border-radius: 10px; background: rgba(243,235,255,.24); font-size: 14px; line-height: 20px; font-weight: 600; }
 
+  /* ---------- FAQ ---------- */
+  .faq { margin: 32px 16px 0; padding-bottom: 32px; }
+  .faq-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; white-space: nowrap; }
+  .faq-head h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 600; }
+  .faq-head button { position: relative; top: 1px; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-tertiary); }
+  .faq ul { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .faq li { border-radius: 12px; background: var(--bg-primary); }
+  .faq .q { display: flex; align-items: center; gap: 16px; width: 100%; padding: 16px; text-align: left; font-size: 14px; line-height: 16px; font-weight: 500; }
+  .faq .q span { flex: 1 1 0; min-width: 0; }
+  .faq .q img { flex: none; width: 16px; height: 16px; transition: transform .2s; }
+  .faq li.open .q img { transform: rotate(180deg); }
+  .faq .a { display: none; padding: 0 16px 16px; font-size: 14px; line-height: 20px; color: var(--text-secondary); }
+  .faq li.open .a { display: block; }
+
   /* ---------- Bottom nav ---------- */
   .nav {
     flex: none; background: var(--bg-primary); border-radius: 16px 16px 0 0; display: grid; grid-template-columns: repeat(5, 1fr);
@@ -199,6 +275,8 @@
   .nav a.active { color: #fff; }
   .nav a > img.dot { z-index: 1; width: 6px; height: 6px; left: calc(50% + 9px); top: 6px; }
   .nav a.center > img { width: 44px; height: 44px; top: -18px; object-fit: cover; }
+  .nav a.pulse > img:not(.dot) { animation: walletPulse .3s ease-out; }
+  @keyframes walletPulse { 40% { transform: translateX(-50%) scale(1.25); } }
 
   /* ---------- FX layer ---------- */
   #fx { position: absolute; inset: 0; pointer-events: none; z-index: 20; overflow: hidden; }
@@ -274,8 +352,8 @@
   <header class="header">
     <button class="icon back" aria-label="Назад"><img src="assets/v3/chevron-left20.svg" alt=""></button>
     <div class="title">
-      <h1 class="trim">Kopilka USDT</h1>
-      <div class="timer-row"><img class="clock" src="assets/v3/clock.svg" alt=""><span class="timer" id="timer"></span></div>
+      <h1 class="trim">$1M USDT Pool</h1>
+      <div class="timer-row"><span>Ends in</span><img class="clock" src="assets/v3/clock.svg" alt=""><span class="timer" id="timer"></span></div>
     </div>
     <button class="icon help" id="helpBtn" aria-label="Правила"><img src="assets/v3/circle-question.svg" alt=""></button>
   </header>
@@ -285,15 +363,21 @@
       <div class="hero-bg"></div>
       <div class="rays"></div>
       <div class="grid360">
-        <div class="pool-wrap">
-          <div class="pool" id="pool">
-            <img class="coin" src="assets/v2/coin-badge.png" alt="">
-            <span class="ttl trim">Left in piniatta</span>
-            <span class="value trim" id="poolValue">1,000,000</span>
-          </div>
+        <div class="underglow">
+          <div class="ga"><div><i><img src="assets/v4/glow-a.svg" alt=""></i></div></div>
+          <div class="gb"><div><i><img src="assets/v4/glow-b.svg" alt=""></i></div></div>
+          <div class="gc"><div><i><img src="assets/v4/glow-c.svg" alt=""></i></div></div>
         </div>
 
-        <div class="today"><span>За сегодня уже забрали</span><b id="today">4582 USDT</b></div>
+        <div class="pool-wrap">
+          <div class="pool-stack">
+            <div class="pool" id="pool">
+              <span class="ttl trim">Left in the piñata, USDT</span>
+              <span class="value trim" id="poolValue">1,000,000</span>
+            </div>
+            <div class="collected"><span>Collected</span><b id="collected">0 USDT</b></div>
+          </div>
+        </div>
 
         <div class="rig" id="rig">
           <div id="swing">
@@ -304,35 +388,54 @@
         </div>
       </div>
 
-      <div class="recent">
-        <div class="head"><img src="assets/v3/users.svg" alt=""><span>Последние<br>награды</span></div>
-        <ul id="recent"></ul>
+      <ul class="recent" id="recent"></ul>
+
+      <div class="rake">
+        <div class="top">
+          <span class="pct trim">1.5%</span>
+          <span class="tag trim">bet royalty</span>
+        </div>
+        <p>Get USDT back<br>on casino, sports &amp; esports bets</p>
       </div>
     </section>
 
-    <section class="card">
-      <div class="row">
-        <div class="label">Твой рейкбек <span>· 1.5% со ставок</span></div>
-        <button class="rules" id="rulesBtn">Правила</button>
+    <section class="card" id="card">
+      <div class="guest">
+        <div class="txt">
+          <h3 class="trim">Start collecting USDT</h3>
+          <p>Sign up or log in to start claiming your share of the pool</p>
+        </div>
+        <div class="btns">
+          <button class="btn ghost" id="loginBtn">Log in</button>
+          <button class="btn primary" id="signupBtn">Sign up</button>
+        </div>
       </div>
-      <div class="avail"><b class="trim" id="avail">0.00</b><small>USDT</small></div>
-      <div class="meta">
-        <div class="bar"><span id="poolBar"></span></div><span id="poolPct">осталось 100%</span>
-        <span class="sep"></span>
-        <span class="bal" id="balRow">Баланс <b id="balance">29.20</b> USDT</span>
+      <div class="member">
+        <h3 class="trim">Available to claim</h3>
+        <div class="avail"><i><img src="assets/v2/coin-badge.png" alt=""></i><span><span id="avail">0.00</span> USDT</span></div>
+        <button class="hit-btn" id="hitBtn">Claim now</button>
       </div>
-      <button class="hit-btn" id="hitBtn">Claim now in BTC</button>
     </section>
+
+    <div class="hint" aria-hidden="true">
+      <img class="glow" src="assets/v4/hint-glow.svg" alt="">
+      <img class="chev" src="assets/v4/hint-chevrons.svg" alt="">
+    </div>
 
     <section class="games">
-      <h2 class="trim-lines">Claimers are play here!<br>Lets earn BTC</h2>
+      <h2><em>The action starts here</em><br>Bet &amp; grab your share while the pool lasts</h2>
       <div class="seg" id="seg">
         <button class="on" data-tab="slots"><img src="assets/v3/seg-slots.svg" alt="">Slots</button>
-        <button data-tab="esports"><img src="assets/v3/seg-esports.svg" alt="">Esports</button>
         <button data-tab="sports"><img src="assets/v3/seg-sports.svg" alt="">Sports</button>
+        <button data-tab="esports"><img src="assets/v3/seg-esports.svg" alt="">Esports</button>
       </div>
       <div class="grid" id="grid"></div>
       <button class="view-all" id="viewAll">View all slots →</button>
+    </section>
+
+    <section class="faq">
+      <div class="faq-head"><h2>Most popular questions</h2><button id="rulesBtn">Read all rules →</button></div>
+      <ul id="faq"></ul>
     </section>
   </main>
 
@@ -341,7 +444,7 @@
     <a href="#"><img src="assets/nav/sports.svg" alt="">Sports</a>
     <a href="#" class="center"><img src="assets/nav/chexxy.png" alt="">CHEXXY</a>
     <a href="#"><img src="assets/nav/esports.svg" alt="">Esports</a>
-    <a href="#" class="active"><img class="dot" src="assets/nav/dot.svg" alt=""><img src="assets/nav/user.svg" alt="">Profile</a>
+    <a href="#" class="active" id="wallet"><img class="dot" src="assets/nav/dot.svg" alt=""><img src="assets/nav/user.svg" alt="">Profile</a>
   </nav>
 
   <div id="fx"></div>
@@ -365,6 +468,7 @@
         <button data-bet="100">Казино $100</button>
         <button data-bet="500">Спорт $500</button>
         <button data-bet="5000">Слоты $5 000</button>
+        <button id="guestBtn">Гостевой режим</button>
         <button id="resetBtn">Сбросить демо</button>
       </div>
     </div>
@@ -376,7 +480,7 @@
   'use strict';
   const RAKEBACK = 0.015;
   const POOL_TOTAL = 1_000_000;
-  const STORE_KEY = 'penyatta-demo-v3';
+  const STORE_KEY = 'penyatta-demo-v4';
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const $ = (id) => document.getElementById(id);
@@ -385,7 +489,7 @@
   /* ---------------- State ---------------- */
   const defaults = () => ({
     pool: POOL_TOTAL - 18_432.17,         // some already looted before the user arrived
-    today: 4582,
+    authed: true,                         // member by default; the rules sheet has a guest switch
     available: 14.12,                     // user's claimable rakeback
     balance: 29.2,
     endsAt: Date.now() + ((39 * 24 + 23) * 3600 + 56 * 60 + 57) * 1000,
@@ -402,14 +506,11 @@
 
   function renderStatic() {
     $('avail').textContent = fmt2(state.available);
-    $('today').textContent = `${Math.floor(state.today)} USDT`;
+    $('card').classList.toggle('authed', !!state.authed);
     const btn = $('hitBtn');
-    if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Пул пуст'; }
-    else { btn.disabled = false; btn.textContent = 'Claim now in BTC'; btn.classList.toggle('idle', state.available < 0.01); }
-    const pct = Math.max(0, state.pool / POOL_TOTAL * 100);
-    $('poolBar').style.width = pct + '%';
-    $('poolPct').textContent = `осталось ${pct >= 10 ? pct.toFixed(1) : pct.toFixed(2)}%`;
-    $('pool').classList.toggle('low', pct < 25);
+    if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Pool is empty'; }
+    else { btn.disabled = false; btn.textContent = 'Claim now'; btn.classList.toggle('idle', state.available < 0.01); }
+    $('pool').classList.toggle('low', state.pool / POOL_TOTAL < 0.25);
     pinata.classList.toggle('empty', state.pool <= 0);
     $('ended').classList.toggle('show', state.pool <= 0);
   }
@@ -419,7 +520,7 @@
     shown.pool += (state.pool - shown.pool) * k;
     if (Math.abs(state.pool - shown.pool) < 0.5) shown.pool = state.pool;
     $('poolValue').textContent = fmtInt(shown.pool);
-    $('balance').textContent = fmt2(shown.balance);
+    $('collected').textContent = `${fmtInt(POOL_TOTAL - Math.floor(Math.max(0, shown.pool)))} USDT`;
   }
 
   /* ---------------- Timer ---------------- */
@@ -430,7 +531,7 @@
     const h = Math.floor(s / 3600); s %= 3600;
     const m = Math.floor(s / 60); s %= 60;
     const p = (n) => String(n).padStart(2, '0');
-    $('timer').innerHTML = `${d}d${DOT}${p(h)}${DOT}${p(m)}${DOT}${p(s)}`;
+    $('timer').innerHTML = `<span>${d}d&nbsp;</span>${DOT}${p(h)}${DOT}${p(m)}${DOT}${p(s)}`;
   }
   tickTimer(); setInterval(tickTimer, 1000);
 
@@ -456,8 +557,10 @@
     const r = pinataImg.getBoundingClientRect(), a = appRect();
     return { x: r.left - a.left + r.width * 0.5, y: r.top - a.top + r.height * 0.5 };
   }
+  // Claimed coins fly into the wallet: the Profile tab in the bottom nav.
+  const wallet = $('wallet');
   function balanceTarget() {
-    const r = $('balance').getBoundingClientRect(), a = appRect();
+    const r = wallet.querySelector('img:not(.dot)').getBoundingClientRect(), a = appRect();
     return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 };
   }
   const PAPER = ['#a463ff', '#7b3fe4', '#fe0760', '#ff5fa2', '#c79bff', '#ffd23f'];
@@ -466,6 +569,7 @@
     const el = document.createElement('div');
     el.className = 'p ' + kind;
     if (kind === 'paper') el.style.background = PAPER[(Math.random() * PAPER.length) | 0];
+    el.style.transform = `translate(${x - 13}px, ${y - 16}px)`; // no flash at 0,0 before the first frame
     fx.appendChild(el);
     parts.push({ el, kind, x, y, vx: 0, vy: 0, rot: Math.random() * 360, vr: (Math.random() - .5) * 720, life: 0, ...opts });
   }
@@ -528,6 +632,7 @@
     const dir = fromX == null ? (Math.random() < .5 ? -1 : 1) : (fromX < c.x ? 1 : -1);
 
     if (state.pool <= 0) { kick(dir * 0.4); squash(); return; }
+    if (!state.authed) { kick(dir * 0.7); squash(); toast('Войди или зарегистрируйся, чтобы забирать USDT из пиньяты'); return; }
     if (claiming) { kick(dir * 0.5); squash(); return; }
 
     if (state.available < 0.01) {
@@ -541,16 +646,14 @@
     const amount = Math.min(state.available, state.pool);
     state.available -= amount;
     state.pool -= amount;
-    state.today += amount;
     save(); renderStatic();
 
     kick(dir * 1.4); squash();
     burstAt(c.x + (dir < 0 ? 40 : -40), c.y - 10);
     popText(`+${fmt2(amount)} USDT`, c.x, c.y - 90);
-    pushRecent({ name: 'Ты', amount, me: true });
+    pushRecent({ name: 'You', amount, me: true });
 
     const n = Math.round(Math.min(28, Math.max(8, 6 + Math.log2(amount + 1) * 3)));
-    const per = amount / n;
     const target = balanceTarget();
     let arrived = 0;
     for (let i = 0; i < n; i++) {
@@ -558,13 +661,9 @@
         vx: (Math.random() - .5) * 520, vy: -250 - Math.random() * 420,
         homing: true, flyAt: 0.35 + Math.random() * 0.35, target,
         onArrive: () => {
-          shown.balance += per; arrived++;
-          const row = $('balRow'); row.classList.add('pulse');
-          if (arrived === n) {
-            shown.balance = state.balance; // snap away float drift
-            setTimeout(() => row.classList.remove('pulse'), 300);
-            claiming = false; renderStatic();
-          }
+          arrived++;
+          wallet.classList.remove('pulse'); void wallet.offsetWidth; wallet.classList.add('pulse');
+          if (arrived === n) { claiming = false; renderStatic(); }
         },
       });
     }
@@ -586,20 +685,24 @@
   ['gesturestart', 'gesturechange'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
   $('hitBtn').addEventListener('click', () => hit(null));
 
+  // Demo auth: both buttons just flip the card to the member state.
+  const signIn = () => { state.authed = true; save(); renderStatic(); toast('Демо: ты в аккаунте — рейкбек можно забирать'); };
+  $('loginBtn').addEventListener('click', signIn);
+  $('signupBtn').addEventListener('click', signIn);
+
   /* ---------------- Recent rewards feed ---------------- */
-  const NAMES = ['khaled', 'ueyama', 'py1337', '25kings', 'alex', 'max_pro', 'kriptoboss', 'dimon', 'luckyKate', 'sasha77', 'whale', 'neo', 'igor', 'mila', 'betking', 'zhenya', 'degen42'];
-  const mask = (s) => s.slice(0, 3) + '...';
-  const randName = () => mask(NAMES[(Math.random() * NAMES.length) | 0]);
+  const NAMES = ['kharitonov', 'khaled', 'ueyama', 'py1337', '25kings', 'max_pro', 'kriptoboss', 'dimon', 'luckyKate', 'sasha77', 'whale', 'neo', 'igor', 'mila', 'betking', 'zhenya', 'degen42'];
+  const randName = () => NAMES[(Math.random() * NAMES.length) | 0];
   const recent = $('recent');
   const USDT = '<img src="assets/v3/usdt.svg" alt="">';
   function pushRecent({ name, amount, me }) {
     const li = document.createElement('li');
     li.className = 'chip' + (me ? ' me' : '');
-    li.innerHTML = `<span class="who">${name}</span>${USDT}<b>${fmt2(amount)}</b>`;
+    li.innerHTML = `<span class="who">${name}</span><span class="amt">${USDT}<b>${fmt2(amount)}</b></span>`;
     recent.prepend(li);
-    while (recent.children.length > 4) recent.lastElementChild.remove();
+    while (recent.children.length > 5) recent.lastElementChild.remove();
   }
-  [['25k...', 4.12], ['py1...', 14.12], ['uey...', 14.12], ['kha...', 14.12]].forEach(([name, amount]) => pushRecent({ name, amount }));
+  [['mila', 5.4], ['sasha77', 3.76], ['dimon', 8.82], ['ueyama', 16.34], ['kharitonov', 14.12]].forEach(([name, amount]) => pushRecent({ name, amount }));
 
   /* ---------------- Other players looting (FOMO) ---------------- */
   function randomClaim() {
@@ -610,7 +713,7 @@
   function otherHit() {
     if (state.pool > 0) {
       const amount = Math.min(randomClaim(), state.pool);
-      state.pool -= amount; state.today += amount;
+      state.pool -= amount;
       save(); renderStatic();
       pushRecent({ name: randName(), amount });
       // Someone else's stick hits the llama: small kick and a few coins fall away (not to you).
@@ -651,6 +754,21 @@
   });
   renderGames('slots');
 
+  /* ---------------- FAQ accordion ---------------- */
+  const FAQ = [
+    ['How does the piñata pool work?', 'One pool of 1,000,000 USDT is shared by every player. Each claim takes its share out of it, and the pool only shrinks.'],
+    ['Where does my rakeback come from?', '1.5% of every bet you place goes into your claimable rakeback. It waits for you here until you claim it.'],
+    ['Which bets count toward the 1.5% rakeback, and how is it counted?', 'Slots, casino, esports and sports: every settled bet counts, win or lose.'],
+    ['When can I claim my USDT?', 'Any time while the pool still has USDT and the timer is running. Tap Claim now or hit the llama.'],
+    ['What happens when the pool is empty?', 'Claims stop for this season, even if you still have unclaimed rakeback. Claim early.'],
+    ['Is there a limit on how much I can claim in one go?', 'No. You claim everything you have collected, as long as the pool can cover it.'],
+  ];
+  const CHEV = '<img src="assets/v4/chevron-bottom16.svg" alt="">';
+  $('faq').innerHTML = FAQ.map(([q, a]) => `<li><button class="q"><span>${q}</span>${CHEV}</button><div class="a">${a}</div></li>`).join('');
+  $('faq').addEventListener('click', (e) => {
+    const q = e.target.closest('.q'); if (q) q.parentElement.classList.toggle('open');
+  });
+
   /* ---------------- Rules sheet + demo bets ---------------- */
   const openSheet = () => app.classList.add('open');
   $('helpBtn').addEventListener('click', openSheet);
@@ -662,6 +780,7 @@
     app.classList.remove('open');
     toast(`Ставка $${bet.toLocaleString('ru-RU')} → +${fmt2(bet * RAKEBACK)} USDT к выбиванию`);
   }));
+  $('guestBtn').addEventListener('click', () => { state.authed = false; save(); renderStatic(); app.classList.remove('open'); });
   $('resetBtn').addEventListener('click', () => {
     state = defaults(); shown.pool = state.pool; shown.balance = state.balance; save(); renderStatic(); app.classList.remove('open');
   });
