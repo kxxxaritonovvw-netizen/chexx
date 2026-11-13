@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#110c18">
+<title>$1M USDT Pool · Desktop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  /* Desktop layout of the piñata screen. Figma: XjXU6fg3jQArN1tZQqX80H, frame 32953:314550 (1920×1080).
+     Content column is 1536px: 240px sidebar + 16px gap + 1280px main. */
+  :root {
+    --bg-base: #110c18;
+    --bg-primary: #221b2d;
+    --bg-secondary: #342c3f;
+    --btn-gray: #453c53;
+    --brand: #fe0760;
+    --green: #2fd27a;
+    --success: #01c26b;
+    --text: #ffffff;
+    --text-secondary: rgba(243,235,255,.64);
+    --text-tertiary: rgba(243,235,255,.48);
+    --text-quaternary: rgba(243,235,255,.32);
+    --ghost: rgba(243,235,255,.16);
+    --font-wide: "Balgin Expanded", "Unbounded", system-ui, sans-serif;
+    --font: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    --header-h: 60px;
+    --gap: 16px;
+  }
+  @font-face {
+    font-family: "Balgin Expanded"; font-weight: 700; font-style: normal; font-display: swap;
+    src: url(assets/fonts/balgin-boldexpanded-webfont.woff2) format("woff2");
+    ascent-override: 70.02%; descent-override: 0%; line-gap-override: 0%;
+  }
+  .trim { line-height: .7em !important; }
+  * { box-sizing: border-box; }
+  html { background: var(--bg-base); scrollbar-color: rgba(243,235,255,.16) transparent; }
+  body { margin: 0; min-height: 100%; background: var(--bg-base); color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; }
+  p { margin: 0; }
+
+  .wrap { width: min(1536px, calc(100% - 32px)); margin: 0 auto; }
+
+  /* ---------- Site header (sticky) ---------- */
+  .site-header { position: sticky; top: 0; z-index: 50; height: var(--header-h); background: var(--bg-base); }
+  .site-header .wrap { height: 100%; display: flex; align-items: center; }
+  .logo { flex: none; width: 240px; height: 60px; display: grid; place-items: center; }
+  .logo span { position: relative; width: 180px; height: 44px; }
+  .logo img { position: absolute; }
+  .logo .l { left: 0; top: 13.14px; width: 90.52px; height: 17.155px; }
+  .logo .r { left: 90.97px; top: 13px; width: 89.029px; height: 17.51px; }
+  .logo .c { left: 120.31px; top: 13px; width: 30.351px; height: 17.51px; }
+  .top-nav { display: flex; gap: 24px; margin-left: 16px; font-size: 16px; line-height: 24px; font-weight: 600; }
+  .top-nav a:hover { color: var(--text-secondary); }
+  .hdr-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .btn { height: 40px; padding: 10px 16px; border-radius: 10px; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; transition: filter .15s, transform .08s; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn:active { transform: scale(.98); }
+  .btn.gray { background: var(--btn-gray); }
+  .btn.primary { background: var(--brand); }
+  .btn.ghost { background: var(--ghost); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .hdr-balance { display: none; align-items: center; gap: 6px; height: 40px; padding: 0 6px 0 12px; border-radius: 10px; background: var(--bg-primary); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .hdr-balance img { width: 18px; height: 18px; }
+  .hdr-balance .btn { height: 32px; padding: 6px 12px; margin-left: 6px; }
+  .hdr-balance.bump { animation: bump .35s ease-out; }
+  @keyframes bump { 40% { transform: scale(1.06); } }
+  .hdr-guest { display: flex; gap: 8px; }
+  body.authed .hdr-balance { display: flex; }
+  body.authed .hdr-guest { display: none; }
+
+  /* ---------- Layout ---------- */
+  .layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--gap); padding-top: 16px; align-items: start; }
+
+  /* ---------- Sidebar: sticky under the header; its list scrolls on its own when the window is short ---------- */
+  .sidebar { position: sticky; top: calc(var(--header-h) + 16px); display: flex; flex-direction: column; gap: 4px; max-height: calc(100vh - var(--header-h) - 32px); }
+  .sb-search { flex: none; padding: 8px; border-radius: 12px; background: var(--bg-primary); }
+  .sb-search label { display: flex; align-items: center; gap: 4px; height: 32px; padding: 8px; border-radius: 8px; background: var(--bg-secondary); cursor: text; }
+  .sb-search img { width: 16px; height: 16px; }
+  .sb-search input { flex: 1; min-width: 0; padding: 0 4px; border: 0; outline: 0; background: none; color: var(--text); font: 500 12px/16px var(--font); }
+  .sb-search input::placeholder { color: var(--text-quaternary); }
+  .sb-scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 4px; border-radius: 12px; scrollbar-width: none; }
+  .sb-scroll::-webkit-scrollbar { display: none; }
+  .sb-sec { flex: none; display: flex; flex-direction: column; gap: 2px; padding: 4px; border-radius: 12px; background: var(--bg-primary); }
+  .sb-item { position: relative; display: flex; align-items: center; gap: 10px; height: 40px; padding: 10px 12px; border-radius: 8px; font-size: 14px; line-height: 20px; font-weight: 500; transition: background .15s; }
+  .sb-item:hover { background: rgba(243,235,255,.06); }
+  .sb-item > img { width: 20px; height: 20px; flex: none; }
+  .sb-item > span { flex: 1; }
+  .sb-item .more { position: absolute; right: 12px; top: 12px; width: 16px; height: 16px; padding: 2px; border-radius: 4px; background: var(--btn-gray); box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+  .sb-item .more img { width: 12px; height: 12px; }
+  .sb-item .earn { display: flex; align-items: center; gap: 2px; font-family: var(--font-wide); font-weight: 700; font-size: 14px; letter-spacing: -.28px; color: var(--success); }
+  .sb-item .earn img { width: 14px; height: 14px; }
+  .sb-loyal { flex: none; padding: 4px; border-radius: 12px; background: linear-gradient(180deg, rgba(138,29,255,.4) 0%, rgba(34,27,45,0) 100%), var(--bg-primary); }
+  .sb-loyal .head { position: relative; display: flex; align-items: center; gap: 8px; height: 40px; padding: 10px 12px; border-radius: 8px; background: #8a1dff; overflow: hidden; font-size: 14px; line-height: 20px; font-weight: 500; }
+  .sb-loyal .head > img { width: 20px; height: 20px; }
+  .sb-loyal .head .pet { position: absolute; left: 165px; top: -7px; width: 62px; height: 62px; }
+  .sb-loyal ul { list-style: none; margin: 0; padding: 12px 12px 8px; display: flex; flex-direction: column; gap: 8px; }
+  .sb-loyal li { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--text-secondary); }
+  .sb-loyal li span:first-child { flex: 1; }
+  .counter { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--ghost); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 12px; line-height: 16px; color: #fff; text-align: center; }
+
+  /* Sidebar promo: the pool itself, live. Figma 32973:329419. */
+  .sb-promo {
+    flex: none; position: relative; height: 86px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 50px rgba(70,0,145,.25); cursor: pointer;
+    background:
+      url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 86' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(6.587 2.6678 -9.6095 3.6908 59.268 43)'><stop stop-color='rgba(152,59,252,1)' offset='0'/><stop stop-color='rgba(152,59,252,0)' offset='1'/></radialGradient></defs></svg>"),
+      url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 86' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(11.743 0 -1.3037e-14 10.191 2.5684 86)'><stop stop-color='rgba(188,59,252,1)' offset='0'/><stop stop-color='rgba(188,59,252,0)' offset='0.83221'/></radialGradient></defs></svg>"),
+      url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 86' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(-10.804 8.313 -12.051 -9.0319 228.04 2.8704)'><stop stop-color='rgba(164,89,255,1)' offset='0'/><stop stop-color='rgba(164,89,255,0)' offset='1'/></radialGradient></defs></svg>"),
+      url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 86' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(11.283 8.0597 -15.278 12.333 7.1735 5.4031)'><stop stop-color='rgba(123,0,255,1)' offset='0'/><stop stop-color='rgba(123,0,255,0)' offset='0.60361'/></radialGradient></defs></svg>"),
+      #460091;
+  }
+  .sb-promo .bg { position: absolute; left: 0; right: 0; top: 0; height: 94px; overflow: hidden; pointer-events: none; }
+  .sb-promo .glow {
+    position: absolute; left: -43.97px; right: -43.98px; top: -76.27px; height: 336.715px;
+    background: url("data:image/svg+xml;utf8,<svg viewBox='0 0 327.95 336.72' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)' opacity='1'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(0.36439 16.115 -20.983 0.6062 163.97 168.87)'><stop stop-color='rgba(154,59,255,1)' offset='0'/><stop stop-color='rgba(141,35,255,1)' offset='0.18388'/><stop stop-color='rgba(129,11,255,1)' offset='0.36776'/><stop stop-color='rgba(108,9,212,1)' offset='0.44996'/><stop stop-color='rgba(87,7,170,1)' offset='0.53216'/><stop stop-color='rgba(66,4,127,1)' offset='0.61435'/><stop stop-color='rgba(45,2,84,1)' offset='0.69655'/><stop stop-color='rgba(31,7,54,1)' offset='0.84827'/><stop stop-color='rgba(17,12,24,1)' offset='1'/></radialGradient></defs></svg>");
+    -webkit-mask: url(assets/desk/promo-mask.svg) 43.969px -21.367px / 240px 918.4px no-repeat; mask: url(assets/desk/promo-mask.svg) 43.969px -21.367px / 240px 918.4px no-repeat;
+  }
+  .sb-promo .rays { position: absolute; left: -71.31px; top: -74.63px; width: 435.88px; height: 593.7px; opacity: .118; mix-blend-mode: plus-lighter; object-fit: cover; }
+  .sb-promo .llama { position: absolute; right: 7px; top: -13px; width: 192px; height: 192px; }
+  .sb-promo .coin-s { position: absolute; right: 148.16px; top: -5.74px; width: 17.682px; height: 19.998px; filter: blur(3px); object-fit: cover; transform: rotate(-13.73deg); }
+  .sb-promo .coin-l { position: absolute; right: -10.9px; top: -5.2px; width: 36.837px; height: 41.663px; object-fit: cover; transform: scaleX(-1) rotate(-13.73deg); filter: drop-shadow(0 5.4px 10px rgba(0,0,0,.32)); }
+  .sb-promo .ttl { position: absolute; left: 16px; top: 10px; font-size: 12px; line-height: 16px; font-weight: 600; }
+  .sb-promo .amt { position: absolute; left: 16px; top: 30px; display: flex; align-items: center; gap: 4px; font-size: 24px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sb-promo .amt img { width: 18px; height: 18px; transform: rotate(-2deg); margin: .3px; }
+  .sb-promo .open { position: absolute; left: 16px; top: 60px; display: flex; align-items: center; gap: 2px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-secondary); }
+  .sb-promo .open img { width: 12px; height: 12px; }
+  .sb-promo .badge { position: absolute; right: 8px; bottom: 8px; display: flex; align-items: center; gap: 4px; padding: 2px 6px 2px 2px; border-radius: 999px; background: rgba(255,255,255,.12); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .sb-promo .badge > img { width: 16px; height: 16px; }
+  .sb-promo .badge .t { font-size: 12px; line-height: 16px; font-weight: 600; }
+  .sb-pwa { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 12px; background: var(--bg-primary); font-size: 14px; line-height: 20px; font-weight: 500; }
+  .sb-pwa .mark { flex: none; width: 32px; height: 32px; border-radius: 6.4px; background: #3a0f61; display: grid; place-items: center; }
+  .sb-pwa .mark img { width: 26.67px; height: 10.67px; }
+  .sb-pwa span { flex: 1; }
+  .sb-pwa .os { display: flex; gap: 2px; }
+  .sb-pwa .os i { width: 20px; height: 20px; display: grid; place-items: center; }
+  .sb-pwa .os .apple { width: 13.567px; height: 16.667px; }
+  .sb-pwa .os .android { width: 14.1px; height: 16.667px; }
+  .sb-pwa .os .windows { width: 15px; height: 15px; }
+
+  /* Shared timer: "39d" then dot-separated hh:mm:ss. */
+  .timer { display: flex; align-items: center; font-variant-numeric: tabular-nums; }
+  .timer i { width: 6px; height: 14px; display: grid; place-items: center; }
+  .timer i img { width: 2px; height: 6px; }
+
+  /* ---------- Main panel: hero on the left, games on the right (Figma 32953:314683, 1280×800) ---------- */
+  .panel {
+    position: relative; height: 800px; display: flex; border-radius: 24px; overflow: hidden;
+    background: var(--bg-base); box-shadow: inset 0 0 160px var(--bg-primary);
+  }
+  .hero-wrap { flex: none; padding: 8px 0 8px 8px; }
+  .hero { position: relative; width: 480px; height: 784px; border-radius: 16px; overflow: hidden; background: #5f09b9; box-shadow: 0 4px 16px rgba(0,0,0,.5); isolation: isolate; }
+
+  .hero-bg {
+    position: absolute; left: 0; right: 0; top: -80px; height: 864px; pointer-events: none;
+    /* Figma 32971:317005: radial 804.08×566.5 centred at (240, 566.5) of a 480×864 box */
+    background: radial-gradient(804.08px 566.5px at 240px 566.5px, #7f00ff 0%, #6300c4 24.878%, #47008a 49.757%, #31006b 59.706%, #1b004d 69.655%, #160633 84.827%, #110c18 100%);
+    -webkit-mask: url(assets/desk/hero-bg-mask.svg) 0 -.1px / calc(100% + 56px) 1344.441px no-repeat; mask: url(assets/desk/hero-bg-mask.svg) 0 -.1px / calc(100% + 56px) 1344.441px no-repeat;
+  }
+  .hero-rays {
+    position: absolute; left: 12.67px; top: 53.52px; width: 476.06px; height: 539.499px; pointer-events: none;
+    background: url(assets/desk/hero-rays.png) center/cover no-repeat; opacity: .0708; mix-blend-mode: plus-lighter;
+    -webkit-mask: url(assets/desk/hero-rays-mask.svg) -2.672px 57.713px / 480px 554.666px no-repeat; mask: url(assets/desk/hero-rays-mask.svg) -2.672px 57.713px / 480px 554.666px no-repeat;
+  }
+  /* Light pooled under the llama: three ellipses turned 153.49deg, each cut by one soft mask (offsets mirrored through the box centre). */
+  .underglow { position: absolute; left: 0; top: 53px; width: 480px; height: 707px; overflow: hidden; pointer-events: none; }
+  .underglow > div { position: absolute; display: flex; align-items: center; justify-content: center; mix-blend-mode: plus-lighter; }
+  .underglow > div > div { flex: none; transform: rotate(153.49deg) skewX(-.94deg); }
+  .underglow i {
+    display: block; position: relative;
+    -webkit-mask: url(assets/desk/glow-mask.svg) var(--mp) / 489.59px 590.041px no-repeat; mask: url(assets/desk/glow-mask.svg) var(--mp) / 489.59px 590.041px no-repeat;
+    -webkit-mask-clip: no-clip; mask-clip: no-clip;
+  }
+  .underglow img { position: absolute; max-width: none; }
+  .underglow .ga { left: 4.32px; top: 483.9px; width: 411.722px; height: 386.33px; }
+  .underglow .ga i { width: 333.005px; height: 263.504px; --mp: -128.774px -83.115px; }
+  .underglow .ga img { left: -17.14%; top: -21.66%; width: 134.28%; height: 143.32%; }
+  .underglow .gb { left: -5.54px; top: 438.41px; width: 467.837px; height: 459.774px; }
+  .underglow .gb i { width: 363.793px; height: 329.687px; --mp: -107.851px -62.421px; }
+  .underglow .gb img { left: -15.69%; top: -17.31%; width: 131.38%; height: 134.62%; }
+  .underglow .gc { left: -32.7px; top: 413.06px; width: 541.628px; height: 500.094px; mix-blend-mode: color; }
+  .underglow .gc i { width: 443.784px; height: 334.806px; --mp: -55.022px -82.651px; }
+  .underglow .gc img { left: -12.86%; top: -17.05%; width: 125.72%; height: 134.1%; }
+
+  .hero-timer { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 4px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--text-secondary); white-space: nowrap; z-index: 4; }
+  .hero-timer > img { width: 14px; height: 14px; }
+  .hero-timer .timer { color: #fff; font-weight: 600; }
+
+  /* Green pool badge with the "You collected" tab, tilted -2deg (Figma 32973:322221) */
+  .pool-wrap { position: absolute; top: 50.01px; left: 50%; transform: translateX(-50%); width: 309.412px; height: 106.629px; display: flex; align-items: center; justify-content: center; z-index: 5; }
+  .pool-stack { flex: none; transform: rotate(-2deg); display: flex; flex-direction: column; align-items: center; isolation: isolate; }
+  .pool {
+    position: relative; z-index: 2; height: 68px; min-width: 280px; padding: 0 16.178px; border-radius: 21.571px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px;
+    background: linear-gradient(90deg, #00431f, #00873f);
+    box-shadow: 0 5.393px 21.571px rgba(0,0,0,.25), 0 1.348px 0 #004430, inset 0 6.274px 37.643px rgba(255,255,255,.24);
+    font-family: var(--font-wide); font-weight: 700; text-transform: uppercase; white-space: nowrap; transition: filter .3s;
+  }
+  .pool .ttl { font-size: 14px; letter-spacing: -.28px; color: var(--text-secondary); }
+  .pool .amount { display: flex; align-items: center; gap: 6px; }
+  .pool .amount img { width: 26px; height: 26px; margin: .446px; transform: rotate(-2deg); }
+  .pool .value { font-size: 32px; letter-spacing: -.64px; font-variant-numeric: tabular-nums; }
+  .pool.low { filter: hue-rotate(-130deg) saturate(1.4); }
+  .collected { position: relative; z-index: 1; height: 28px; min-width: 192.112px; padding: 0 24px; display: flex; justify-content: center; align-items: center; gap: 5.393px; white-space: nowrap; font-size: 14px; line-height: 20px; }
+  .collected > span, .collected > b { position: relative; top: 1.1px; left: -1.22px; }
+  .collected::before {
+    content: ""; position: absolute; inset: 0 -12.05px -2px -12.04px; z-index: -1;
+    border: solid transparent; border-width: 0 36px; border-image: url(assets/desk/collected-pill.svg) 0 36 fill / 0 36px stretch;
+  }
+  /* The pill SVG's backdrop blur lives in a foreignObject that <img>/border-image cannot render: blur the backdrop here. */
+  .collected::after { content: ""; position: absolute; inset: 0 11.5px; z-index: -2; border-radius: 0 0 13.5px 13.5px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .collected.pulse { animation: collectedPulse .3s ease-out; }
+  @keyframes collectedPulse { 40% { transform: scale(1.14); } }
+  .collected span { color: var(--text-secondary); font-weight: 500; }
+  .collected b { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* Llama on its rope: #swing rotates around the rope's top. */
+  .rig { position: absolute; left: 14.525px; top: 141.89px; width: 412.67px; height: 412.67px; z-index: 2; }
+  #swing { position: absolute; inset: 0; transform-origin: 55.5% 0; will-change: transform; }
+  .pinata-hit { position: absolute; inset: 0; cursor: pointer; touch-action: none; }
+  .pinata-hit img {
+    width: 100%; height: 100%; object-fit: cover; pointer-events: none; transform-origin: 55% 30%;
+    -webkit-mask: url(assets/desk/hero-llama-mask.svg) -100.428px -.518px / 587.971px 369.115px no-repeat; mask: url(assets/desk/hero-llama-mask.svg) -100.428px -.518px / 587.971px 369.115px no-repeat;
+  }
+  .pinata-hit img.squash { animation: squash .28s ease-out; }
+  @keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.06, .93); } 60% { transform: scale(.97, 1.04); } 100% { transform: scale(1); } }
+  .pinata-hit.empty img { filter: grayscale(.85) brightness(.7); }
+
+  /* Live feed: six chips, 24px from the left; the newest drops in on top. */
+  .recent { position: absolute; left: 24px; top: 324px; z-index: 3; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .chip { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px 4px; border-radius: 12px; background: rgba(0,0,0,.64); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); white-space: nowrap; }
+  .chip .who { font-size: 10px; line-height: 10px; font-weight: 600; color: var(--text-secondary); max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+  .chip .amt { display: flex; align-items: center; gap: 4px; }
+  .chip img { width: 14px; height: 14px; }
+  .chip b { font-size: 14px; line-height: 20px; font-weight: 600; }
+  .chip.me { background: linear-gradient(rgba(47,210,122,.28), rgba(47,210,122,.28)), rgba(0,0,0,.64); }
+  .chip.me .who, .chip.me b { color: var(--green); }
+
+  .rake { position: absolute; right: 24px; top: 500px; z-index: 3; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .rake .top { width: 110px; display: flex; flex-direction: column; gap: 8px; }
+  .rake .pct { font-family: var(--font-wide); font-weight: 700; font-size: 34px; letter-spacing: -.68px; text-align: center; }
+  .rake .tag { height: 14.317px; border-radius: 121.796px; background: #fff; color: #6a06cc; display: grid; place-items: center; overflow: hidden; font-family: var(--font-wide); font-weight: 700; font-size: 9.081px; letter-spacing: -.1816px; text-transform: uppercase; white-space: nowrap; }
+  .rake p { width: 109.848px; text-align: center; font-size: 12px; line-height: 14px; font-weight: 600; }
+
+  /* Card: 432 wide, 24px from the hero's bottom-left (Figma 32953:314728) */
+  .card {
+    position: absolute; left: 24px; bottom: 24px; width: 432px; z-index: 6; padding: 16px; border-radius: 16px;
+    filter: drop-shadow(0 24px 20px rgba(0,0,0,.4));
+    background: linear-gradient(24.745deg, rgba(34,27,45,0) 62.799%, rgba(254,7,96,.24) 93.377%), linear-gradient(-17.946deg, rgba(34,27,45,0) 60.21%, rgba(254,7,96,.24) 91.161%), var(--bg-base);
+  }
+  .card h3 { margin: 0; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-wide); font-weight: 700; font-size: 14px; letter-spacing: -.28px; text-transform: uppercase; white-space: nowrap; }
+  .card .guest { display: flex; flex-direction: column; gap: 16px; }
+  .card .guest .txt { display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
+  .card .guest p { text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; }
+  .card .btns { display: flex; gap: 8px; }
+  .card .btns .btn { flex: 1 1 0; }
+  /* Claim state: no desktop mockup; the mobile claim card (Figma 32680:172223) at desktop type sizes, same 140px height as the guest card. */
+  .card .member { display: none; flex-direction: column; align-items: center; }
+  .card.authed { background: linear-gradient(24.745deg, rgba(34,27,45,0) 62.799%, rgba(1,174,123,.24) 93.377%), linear-gradient(-17.946deg, rgba(34,27,45,0) 60.21%, rgba(1,174,123,.24) 91.161%), var(--bg-base); }
+  .card.authed .guest { display: none; }
+  .card.authed .member { display: flex; }
+  .card .avail { margin-top: 4px; height: 32px; display: flex; align-items: center; gap: 8px; font-size: 28px; line-height: 32px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .card .avail img { width: 24px; height: 24px; }
+  .hit-btn { margin-top: 12px; width: 100%; height: 40px; border-radius: 10px; background: var(--brand); font-size: 14px; line-height: 20px; font-weight: 600; transition: filter .15s, transform .08s; }
+  .hit-btn:hover { filter: brightness(1.12); }
+  .hit-btn:active { transform: scale(.98); }
+  .hit-btn:disabled { background: rgba(255,255,255,.1); color: var(--text-secondary); cursor: default; filter: none; }
+
+  /* FX inside the hero: coins, paper, pop-ups */
+  #fx { position: absolute; inset: 0; pointer-events: none; z-index: 20; overflow: hidden; }
+  .p { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+  .p.coin { width: 30px; height: 38px; background: url(assets/coin.png) center/contain no-repeat; }
+  .p.paper { width: 8px; height: 14px; border-radius: 1px; }
+  .burst { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; pointer-events: none; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.95) 0 12%, rgba(255,210,63,.8) 13% 26%, rgba(254,7,96,0) 60%); animation: burst .35s ease-out forwards; }
+  @keyframes burst { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+  .pop { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-wide); font-weight: 700; font-size: 30px; color: #fff; text-shadow: 0 2px 0 #721aff, 0 6px 18px rgba(0,0,0,.4); animation: popUp 1.3s cubic-bezier(.2,.8,.2,1) forwards; white-space: nowrap; }
+  @keyframes popUp { 0% { opacity: 0; transform: translate(-50%, -30%) scale(.6); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.1); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -160%) scale(1); } }
+  .ended { position: absolute; inset: 0; z-index: 30; display: none; place-items: center; text-align: center; padding: 24px; background: radial-gradient(circle at 50% 40%, rgba(65,15,109,.6), rgba(17,12,24,.92)); }
+  .ended.show { display: grid; }
+  .ended h3 { font-family: var(--font-wide); font-size: 24px; margin: 0 0 8px; }
+  .ended p { color: var(--text-secondary); font-size: 16px; }
+
+  /* ---------- Games: the right part of the panel scrolls on its own ----------
+     Wheel over the games scrolls them first and hands over to the page at either end (scroll chaining);
+     a soft fade at the top/bottom edge appears only when there is more to scroll that way. */
+  .games-scroll {
+    flex: 1 1 auto; min-width: 0; overflow-y: auto; overscroll-behavior-y: auto; scroll-behavior: smooth;
+    scrollbar-width: thin; scrollbar-color: transparent transparent; transition: scrollbar-color .2s;
+    --fade-top: 0px; --fade-bottom: 0px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
+  }
+  .games-scroll:hover, .games-scroll:focus-visible { scrollbar-color: rgba(243,235,255,.2) transparent; }
+  .games-scroll.more-top { --fade-top: 48px; }
+  .games-scroll.more-bottom { --fade-bottom: 64px; }
+  .games-scroll::-webkit-scrollbar { width: 8px; }
+  .games-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; border: 2px solid transparent; background-clip: padding-box; }
+  .games-scroll:hover::-webkit-scrollbar-thumb { background-color: rgba(243,235,255,.2); }
+  .games-scroll:focus-visible { outline: none; }
+  .games-col { width: min(560px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 40px; display: flex; flex-direction: column; align-items: center; gap: 40px; }
+  /* Title: 3 lines of Balgin 20/20 trimmed to caps (54px), tilted -1deg; its rotated box (65.161px) takes the room in the flow, as in Figma. */
+  .games-col h2 { margin: 0; height: 65.161px; display: flex; align-items: center; justify-content: center; }
+  .games-col h2 span {
+    flex: none; display: block; margin: -3px 0; width: 640px; transform: rotate(-1deg); text-align: center;
+    font-family: var(--font-wide); font-weight: 700; font-size: 20px; line-height: 20px; letter-spacing: -.4px; text-transform: uppercase;
+  }
+  .games-col h2 em { font-style: normal; color: var(--brand); }
+  /* Narrow games area (laptops): the 640px title would be clipped, so it shrinks and fits the column. */
+  .games-scroll { container-type: inline-size; }
+  @container (max-width: 640px) {
+    .games-col h2 { height: auto; }
+    .games-col h2 span { width: 100%; margin: 6px 0; font-size: 16px; line-height: 16px; letter-spacing: -.32px; }
+  }
+  .games-body { width: 100%; display: flex; flex-direction: column; gap: 24px; }
+  .seg { display: flex; height: 40px; padding: 2px; border-radius: 12px; background: var(--bg-primary); }
+  .seg button { position: relative; flex: 1 1 0; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 12px; border-radius: 8px; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .28px; color: #f3ebff; }
+  .seg button img { width: 16px; height: 16px; }
+  .seg button.on { background: var(--bg-base); color: #fff; }
+  .seg button + button::before { content: ""; position: absolute; left: 0; top: 50%; width: 1px; height: 16px; margin-top: -8px; border-radius: 999px; background: #f3ebff; opacity: 1; }
+  .seg button.on::before, .seg button.on + button::before { opacity: 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; }
+  .game { position: relative; height: 170px; border-radius: 12px; overflow: hidden; background: var(--bg-primary); cursor: pointer; }
+  .game > img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
+  .game:hover > img { transform: scale(1.04); }
+  .game .fav { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; border-radius: 999px; background: var(--bg-base); display: grid; place-items: center; }
+  .game .fav img { width: 16px; height: 16px; transition: transform .15s; }
+  .game .fav.on { background: var(--brand); }
+  .game .fav:active img { transform: scale(.85); }
+  .view-all { width: 100%; height: 40px; border-radius: 10px; background: var(--btn-gray); font-size: 14px; line-height: 20px; font-weight: 600; }
+  .view-all:hover { filter: brightness(1.12); }
+
+  /* ---------- Footer (Figma 32973:322264) ---------- */
+  .site-footer { margin-top: 48px; display: flex; flex-direction: column; gap: 4px; }
+  .partners { display: flex; gap: 4px; }
+  .partners a { flex: 1 1 0; height: 64px; border-radius: 16px; display: grid; place-items: center; background: linear-gradient(180deg, #2a0b47 0%, #4a137c 100%); }
+  .partners .esl { width: 158px; height: 26px; }
+  .partners .cp { width: 131px; height: 54px; }
+  .footer-1 { display: flex; flex-direction: column; gap: 24px; padding: 24px; border-radius: 16px; background: var(--bg-primary); }
+  .f-actions { display: flex; gap: 24px; align-items: flex-start; }
+  .f-logo { width: 60px; height: 32px; display: grid; place-items: center; }
+  .f-logo img { width: 60px; height: 24px; }
+  .f-social { display: flex; gap: 8px; }
+  .f-social a { width: 32px; height: 32px; padding: 6px; border-radius: 8px; background: var(--btn-gray); }
+  .f-social img { width: 20px; height: 20px; }
+  .f-selects { flex: 1; display: flex; gap: 8px; justify-content: flex-end; }
+  .select { width: 148px; height: 32px; display: flex; align-items: center; border-radius: 8px; background: var(--bg-base); font-size: 12px; line-height: 16px; font-weight: 500; }
+  .select .l { flex: 1; display: flex; align-items: center; gap: 4px; padding: 8px; }
+  .select .l span { padding: 0 4px; }
+  .select img { width: 16px; height: 16px; }
+  .select .r { padding: 8px; }
+  .f-links { display: flex; gap: 24px; }
+  .f-links div { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; white-space: nowrap; }
+  .f-links h4 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
+  .f-links a { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--text-tertiary); display: flex; align-items: center; gap: 4px; }
+  .f-links a:hover { color: var(--text-secondary); }
+  .f-links a img { width: 16px; height: 16px; }
+  .footer-2 { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 16px 24px; border-radius: 16px 16px 0 0; background: var(--bg-primary); }
+  .f-badges { display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .f-badges .age { font-size: 18px; line-height: 28px; font-weight: 600; color: var(--text-tertiary); }
+  .f-badges .lic { width: 124px; height: 36px; background: #867f92; -webkit-mask: url(assets/desk/lic-mask.png) center / 124px 36px no-repeat; mask: url(assets/desk/lic-mask.png) center / 124px 36px no-repeat; }
+  .f-badges .gcb { width: 84px; height: 48px; border-radius: 8px; object-fit: cover; }
+  .f-badges .seal { position: relative; width: 120px; height: 48px; font-family: Arial, sans-serif; color: #fff; white-space: nowrap; }
+  .f-badges .seal img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .f-badges .seal span { position: absolute; left: 10.8px; }
+  .f-badges .seal .a { top: 3.6px; font-size: 12px; font-weight: 700; }
+  .f-badges .seal .b { top: 19.2px; font-size: 8.4px; }
+  .f-badges .seal .c { top: 30px; font-size: 4.8px; }
+  .f-badges .seal .d { top: 36px; font-size: 4.8px; }
+  .copy { max-width: 1232px; text-align: center; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--text-tertiary); }
+  .mobile-link { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--brand); }
+  .mobile-link img { width: 16px; height: 16px; }
+
+  /* ---------- Toast + demo panel (demo only) ---------- */
+  .toast { position: fixed; left: 50%; top: calc(var(--header-h) + 20px); transform: translateX(-50%) translateY(-10px); z-index: 70; background: rgba(17,12,24,.94); border: 1px solid rgba(255,255,255,.1); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .demo { position: fixed; right: 16px; bottom: 16px; z-index: 60; width: 240px; padding: 12px; border-radius: 16px; background: rgba(34,27,45,.92); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(243,235,255,.08); box-shadow: 0 12px 40px rgba(0,0,0,.5); font-size: 12px; }
+  .demo summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; }
+  .demo summary::-webkit-details-marker { display: none; }
+  .demo summary::after { content: "▾"; color: var(--text-tertiary); transition: transform .2s; }
+  .demo[open] summary::after { transform: rotate(180deg); }
+  .demo .lbl { margin: 12px 0 6px; color: var(--text-secondary); }
+  .demo .row { display: flex; gap: 4px; }
+  .demo .row button { flex: 1; height: 32px; border-radius: 8px; background: rgba(243,235,255,.1); font-weight: 600; }
+  .demo .row button.on { background: var(--brand); }
+  .demo .row button:hover:not(.on) { background: rgba(243,235,255,.16); }
+  .demo .reset { margin-top: 8px; width: 100%; height: 32px; border-radius: 8px; background: rgba(243,235,255,.1); font-weight: 600; }
+
+  /* ---------- Narrower desktops ---------- */
+  @media (max-width: 1279px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .sidebar { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .games-scroll { scroll-behavior: auto; } }
+</style>
+</head>
+<body class="authed">
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="CHEXX"><span>
+      <img class="l" src="assets/desk/logo-left.svg" alt=""><img class="r" src="assets/desk/logo-right.svg" alt=""><img class="c" src="assets/desk/logo-crystal.svg" alt="">
+    </span></a>
+    <nav class="top-nav"><a href="#">Casino</a><a href="#">Sports</a><a href="#">Esports</a></nav>
+    <div class="hdr-actions">
+      <div class="hdr-guest"><button class="btn gray js-signin">Log in</button><button class="btn primary js-signin">Sign up</button></div>
+      <div class="hdr-balance" id="hdrBalance"><img src="assets/v5/usdt20.svg" alt=""><span id="balance">0.00</span><button class="btn primary">Wallet</button></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <aside class="sidebar" aria-label="Навигация">
+    <div class="sb-search"><label><img src="assets/desk/search.svg" alt=""><input type="search" placeholder="Search events and games"></label></div>
+    <div class="sb-scroll">
+      <nav class="sb-sec">
+        <a class="sb-item" href="#"><img src="assets/desk/casino.svg" alt=""><span>Casino</span><i class="more"><img src="assets/desk/chevron-bottom12.svg" alt=""></i></a>
+        <a class="sb-item" href="#"><img src="assets/desk/sports.svg" alt=""><span>Sports</span><i class="more"><img src="assets/desk/chevron-bottom12.svg" alt=""></i></a>
+        <a class="sb-item" href="#"><img src="assets/desk/esports.svg" alt=""><span>Esports</span><i class="more"><img src="assets/desk/chevron-bottom12.svg" alt=""></i></a>
+      </nav>
+      <div class="sb-loyal">
+        <a class="head" href="#"><img src="assets/desk/gift.svg" alt=""><span>Loyalty program</span><img class="pet" src="assets/desk/chexxy.png" alt=""></a>
+        <ul>
+          <li><span>Bonuses</span><span class="counter">7</span></li>
+          <li><span>Quests</span><span class="counter">3</span></li>
+          <li><span>Promotions</span><span class="counter">2</span></li>
+        </ul>
+      </div>
+      <a class="sb-promo" href="#stage" aria-label="Пиньята">
+        <div class="bg"><div class="glow"></div><img class="rays" src="assets/desk/promo-rays.png" alt=""><img class="llama" src="assets/desk/promo-llama.png" alt=""></div>
+        <img class="coin-s" src="assets/desk/promo-coin.png" alt=""><img class="coin-l" src="assets/desk/promo-coin.png" alt="">
+        <span class="ttl">Left in the Piñata</span>
+        <span class="amt"><img src="assets/desk/usdt18.svg" alt=""><span id="sbPool">1,000,000</span></span>
+        <span class="open">Open bonus<img src="assets/desk/chevron-right12.svg" alt=""></span>
+        <span class="badge"><img src="assets/desk/clock16.svg" alt=""><span class="timer t" data-timer></span></span>
+      </a>
+      <nav class="sb-sec">
+        <a class="sb-item" href="#"><img src="assets/desk/user-plus.svg" alt=""><span>Refer &amp; earn</span><span class="earn trim">100<img src="assets/desk/usdt14b.svg" alt=""></span></a>
+        <a class="sb-item" href="#"><img src="assets/desk/book.svg" alt=""><span>Help center</span></a>
+        <a class="sb-item" href="#"><img src="assets/desk/support.svg" alt=""><span>Live chat</span></a>
+      </nav>
+      <a class="sb-pwa" href="#"><i class="mark"><img src="assets/desk/chexx-mark.svg" alt=""></i><span>CHEXX app</span>
+        <span class="os"><i><img class="apple" src="assets/desk/apple.svg" alt=""></i><i><img class="android" src="assets/desk/android.svg" alt=""></i><i><img class="windows" src="assets/desk/windows.svg" alt=""></i></span></a>
+    </div>
+  </aside>
+
+  <main>
+    <section class="panel">
+      <div class="hero-wrap">
+        <div class="hero" id="stage">
+          <div class="hero-bg"></div>
+          <div class="hero-rays"></div>
+          <div class="underglow">
+            <div class="ga"><div><i><img src="assets/desk/glow-a.svg" alt=""></i></div></div>
+            <div class="gb"><div><i><img src="assets/desk/glow-b.svg" alt=""></i></div></div>
+            <div class="gc"><div><i><img src="assets/desk/glow-c.svg" alt=""></i></div></div>
+          </div>
+
+          <div class="hero-timer"><span>Ends in</span><img src="assets/desk/clock14.svg" alt=""><span class="timer" data-timer></span></div>
+
+          <div class="pool-wrap">
+            <div class="pool-stack">
+              <div class="pool" id="pool">
+                <span class="ttl trim">Left in the piñata</span>
+                <span class="amount"><img src="assets/desk/usdt26.svg" alt=""><span class="value trim" id="poolValue">1,000,000</span></span>
+              </div>
+              <div class="collected" id="collectedTab"><span>You collected</span><b id="collected">0 USDT</b></div>
+            </div>
+          </div>
+
+          <div class="rig"><div id="swing"><div class="pinata-hit" id="pinata" role="button" aria-label="Ударить пиньяту"><img id="pinataImg" src="assets/desk/hero-llama.png" alt="Пиньята-лама"></div></div></div>
+
+          <ul class="recent" id="recent"></ul>
+
+          <div class="rake">
+            <div class="top"><span class="pct trim">1.5%</span><span class="tag">bet royalty</span></div>
+            <p>Get USDT back<br>on casino, sports &amp; esports bets</p>
+          </div>
+
+          <div class="card" id="card">
+            <div class="guest">
+              <div class="txt"><h3 class="trim">Start collecting USDT</h3><p>Sign up or log in to start claiming your share of the pool</p></div>
+              <div class="btns"><button class="btn ghost js-signin">Log in</button><button class="btn primary js-signin">Sign up</button></div>
+            </div>
+            <div class="member">
+              <h3 class="trim">Available to claim</h3>
+              <div class="avail"><img src="assets/v5/usdt20.svg" alt=""><span><span id="avail">0.00</span> USDT</span></div>
+              <button class="hit-btn" id="hitBtn">Claim now</button>
+            </div>
+          </div>
+
+          <div id="fx"></div>
+          <div class="ended" id="ended"><div><h3>Пиньята пуста</h3><p>Все 1 000 000 USDT разобрали. Следи за следующим сезоном!</p></div></div>
+        </div>
+      </div>
+
+      <div class="games-scroll more-bottom" id="gamesScroll" tabindex="0" aria-label="Игры">
+        <div class="games-col">
+          <h2><span><em>The action starts here!</em><br>Bet &amp; grab your share before<br>the pool runs out!</span></h2>
+          <div class="games-body">
+            <div class="seg" id="seg">
+              <button class="on" data-tab="slots"><img src="assets/desk/seg-slots.svg" alt="">Slots</button>
+              <button data-tab="sports"><img src="assets/desk/seg-sports.svg" alt="">Sports</button>
+              <button data-tab="esports"><img src="assets/desk/seg-esports.svg" alt="">Esports</button>
+            </div>
+            <div class="grid" id="grid"></div>
+          </div>
+          <button class="view-all" id="viewAll">View all slots →</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="partners">
+        <a href="#" aria-label="ESL official partner"><img class="esl" src="assets/desk/esl.svg" alt=""></a>
+        <a href="#" aria-label="Official partner"><img class="cp" src="assets/desk/cp.svg" alt=""></a>
+      </div>
+      <div class="footer-1">
+        <div class="f-actions">
+          <span class="f-logo"><img src="assets/desk/footer-logo.svg" alt="CHEXX"></span>
+          <div class="f-social">
+            <a href="#" aria-label="Discord"><img src="assets/desk/discord.svg" alt=""></a>
+            <a href="#" aria-label="X"><img src="assets/desk/twitter.svg" alt=""></a>
+            <a href="#" aria-label="Telegram"><img src="assets/desk/telegram.svg" alt=""></a>
+          </div>
+          <div class="f-selects">
+            <button class="select"><span class="l"><img src="assets/desk/flag-en.svg" alt=""><span>English</span></span><span class="r"><img src="assets/desk/chevron-bottom16.svg" alt=""></span></button>
+            <button class="select"><span class="l"><span>Decimal</span></span><span class="r"><img src="assets/desk/chevron-bottom16.svg" alt=""></span></button>
+          </div>
+        </div>
+        <div class="f-links">
+          <div><h4>Casino</h4><a href="#">All games</a><a href="#">CHEXX Originals</a><a href="#">Slots</a><a href="#">Live casino</a><a href="#">Fast games</a><a href="#">Providers</a></div>
+          <div><h4>Sports</h4><a href="#">All sports</a><a href="#">Soccer</a><a href="#">Tennis</a><a href="#">Basketball</a><a href="#">Ice Hockey</a><a href="#">MMA</a></div>
+          <div><h4>Esports</h4><a href="#">All esports</a><a href="#">Counter-Strike 2</a><a href="#">Dota 2</a><a href="#">League of Legends</a><a href="#">Valorant</a><a href="#">Mobile Legends</a></div>
+          <div><h4>Company</h4><a href="#">Support</a><a href="#">Help center</a></div>
+          <div><h4>Information</h4><a href="#">Terms and Conditions</a><a href="#">Privacy Policy</a><a href="#">Responsible gambling</a><a href="#">AML Policy</a><a href="#">Sportsbook rules</a><a href="#">Complaints Policy</a></div>
+          <div><h4>CHEXX app</h4><a href="#"><img src="assets/desk/telegram-circle.svg" alt="">Telegram</a><a href="#"><img src="assets/desk/android16.svg" alt="">Android</a><a href="#"><img src="assets/desk/apple16.svg" alt="">iOS</a><a href="#"><img src="assets/desk/windows16.svg" alt="">Windows</a><a href="#"><img src="assets/desk/apple16.svg" alt="">MacOS</a></div>
+        </div>
+      </div>
+      <div class="footer-2">
+        <div class="f-badges">
+          <span class="age">18+</span>
+          <span class="lic" aria-hidden="true"></span>
+          <img class="gcb" src="assets/desk/lic-gcb.png" alt="">
+          <span class="seal"><img src="assets/desk/badge-seal.svg" alt=""><span class="a">Players Protected</span><span class="b">ABC ADR &amp; Associates</span><span class="c">No: SEAL-2026-000015</span><span class="d">Status:ACTIVE</span></span>
+        </div>
+        <p class="copy">Copyright © 2026 chexx.bet is owned and operated by Continent Gaming N.V., a company registered and established under the laws of Curaçao. Continent Gaming N.V. registration number is 159857 and its registered address is Julianaplein 36, Curaçao. Continent Gaming N.V. is licensed by the Curaçao Gaming Authority under license number OGL/2024/1332/0669. It is the player’s sole responsibility to inquire about the existing laws and regulations of the given jurisdiction for online gambling.</p>
+        <a class="mobile-link" href="index.html"><img src="assets/desk/mobile.svg" alt="">Mobile version</a>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<details class="demo" id="demo" open>
+  <summary>Настройки демо</summary>
+  <div class="lbl">Состояние</div>
+  <div class="row" id="dpStates"><button data-auth="1" class="on">Клейм</button><button data-auth="0">Гость</button></div>
+  <div class="lbl">Ставка (начислится 1.5%)</div>
+  <div class="row"><button data-bet="100">$100</button><button data-bet="500">$500</button><button data-bet="5000">$5 000</button></div>
+  <button class="reset" id="resetBtn">Сбросить демо</button>
+</details>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const RAKEBACK = 0.015, POOL_TOTAL = 1_000_000, STORE_KEY = 'penyatta-desktop-v2';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stage = $('stage'), fx = $('fx'), swing = $('swing'), pinata = $('pinata'), pinataImg = $('pinataImg');
+
+  /* ---------------- State ---------------- */
+  const defaults = () => ({
+    pool: POOL_TOTAL - 18_432.17,
+    authed: true,              // claim case by default
+    available: 14.12,          // user's claimable rakeback
+    collected: 29.2,           // "You collected": this user's own claims only
+    balance: 29.2,             // wallet balance in the header
+    endsAt: Date.now() + ((39 * 24 + 23) * 3600 + 56 * 60 + 57) * 1000,
+  });
+  let state = defaults();
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && s.endsAt) state = { ...state, ...s }; } catch {}
+  if (state.available < 0.01) state.available = defaults().available; // the demo always opens with something to claim
+  const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {} };
+  const fmtInt = (n) => Math.max(0, Math.floor(n)).toLocaleString('en-US');
+  const fmt2 = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const shown = { pool: state.pool, collected: state.collected };
+  let inFlight = 0;
+
+  function renderStatic() {
+    $('avail').textContent = fmt2(state.available);
+    $('balance').textContent = fmt2(state.balance);
+    $('card').classList.toggle('authed', !!state.authed);
+    document.body.classList.toggle('authed', !!state.authed);
+    document.querySelectorAll('#dpStates button').forEach((b) => b.classList.toggle('on', (b.dataset.auth === '1') === !!state.authed));
+    const btn = $('hitBtn');
+    if (state.pool <= 0) { btn.disabled = true; btn.textContent = 'Pool is empty'; }
+    else { btn.disabled = false; btn.textContent = 'Claim now'; }
+    $('pool').classList.toggle('low', state.pool / POOL_TOTAL < 0.25);
+    pinata.classList.toggle('empty', state.pool <= 0);
+    $('ended').classList.toggle('show', state.pool <= 0);
+  }
+  function renderTween(dt) {
+    const k = 1 - Math.exp(-dt * 6);
+    shown.pool += (state.pool - shown.pool) * k;
+    if (Math.abs(state.pool - shown.pool) < 0.5) shown.pool = state.pool;
+    $('poolValue').textContent = fmtInt(shown.pool);
+    $('sbPool').textContent = fmtInt(shown.pool);
+    const mine = state.authed ? state.collected - inFlight : 0;
+    shown.collected += (mine - shown.collected) * k;
+    if (Math.abs(mine - shown.collected) < 0.005) shown.collected = mine;
+    $('collected').textContent = `${shown.collected < 0.005 ? '0' : fmt2(shown.collected)} USDT`;
+  }
+
+  /* ---------------- Timers ---------------- */
+  const DOT = '<i><img src="assets/desk/dots.svg" alt=""></i>';
+  function tickTimer() {
+    let s = Math.max(0, Math.floor((state.endsAt - Date.now()) / 1000));
+    const d = Math.floor(s / 86400); s %= 86400;
+    const h = Math.floor(s / 3600); s %= 3600;
+    const m = Math.floor(s / 60); s %= 60;
+    const p = (n) => String(n).padStart(2, '0');
+    const html = `<span>${d}d&nbsp;</span>${DOT}${p(h)}${DOT}${p(m)}${DOT}${p(s)}`;
+    document.querySelectorAll('[data-timer]').forEach((el) => { el.innerHTML = html; });
+  }
+  tickTimer(); setInterval(tickTimer, 1000);
+
+  /* ---------------- Pendulum ---------------- */
+  const pend = { a: 0, v: 0 };
+  const STIFF = 9, DAMP = 1.1, MAX_A = 0.32;
+  const kick = (impulse) => { pend.v += impulse; };
+  function stepPendulum(dt, t) {
+    const breeze = reduceMotion ? 0 : Math.sin(t * 0.9) * 0.16 + Math.sin(t * 2.3) * 0.04;
+    pend.v += (-STIFF * Math.sin(pend.a) - DAMP * pend.v + breeze) * dt;
+    pend.a += pend.v * dt;
+    if (pend.a > MAX_A) { pend.a = MAX_A; pend.v *= -0.4; }
+    if (pend.a < -MAX_A) { pend.a = -MAX_A; pend.v *= -0.4; }
+    swing.style.transform = `rotate(${pend.a}rad)`;
+  }
+
+  /* ---------------- Particles (hero coordinates) ---------------- */
+  const parts = [];
+  const stageRect = () => stage.getBoundingClientRect();
+  function pinataCenter() { const r = pinataImg.getBoundingClientRect(), a = stageRect(); return { x: r.left - a.left + r.width * 0.5, y: r.top - a.top + r.height * 0.5 }; }
+  const collectedTab = $('collectedTab');
+  function collectedTarget() { const r = collectedTab.getBoundingClientRect(), a = stageRect(); return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 }; }
+  const cardEl = $('card');
+  const PAPER = ['#a463ff', '#7b3fe4', '#fe0760', '#ff5fa2', '#c79bff', '#ffd23f'];
+  function spawn(kind, x, y, opts) {
+    const el = document.createElement('div');
+    el.className = 'p ' + kind;
+    if (kind === 'paper') el.style.background = PAPER[(Math.random() * PAPER.length) | 0];
+    el.style.transform = `translate(${x - 15}px, ${y - 19}px)`;
+    fx.appendChild(el);
+    parts.push({ el, kind, x, y, vx: 0, vy: 0, rot: Math.random() * 360, vr: (Math.random() - .5) * 720, life: 0, ...opts });
+  }
+  function stepParticles(dt) {
+    const H = stage.clientHeight;
+    const cardTop = parts.length ? cardEl.getBoundingClientRect().top - stageRect().top : 0;
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.life += dt;
+      let scale = 1, opacity = 1;
+      if (p.homing && p.life > p.flyAt) {
+        if (!p.from) p.from = { x: p.x, y: p.y };
+        const t = Math.min(1, (p.life - p.flyAt) / 0.55);
+        const e = t * t * (3 - 2 * t);
+        const tg = p.target;
+        const cx = (p.from.x + tg.x) / 2 + (p.from.x < tg.x ? -70 : 70), cy = Math.min(p.from.y, tg.y) - 50;
+        p.x = (1 - e) * (1 - e) * p.from.x + 2 * (1 - e) * e * cx + e * e * tg.x;
+        p.y = (1 - e) * (1 - e) * p.from.y + 2 * (1 - e) * e * cy + e * e * tg.y;
+        scale = 1 - e * 0.55;
+        if (t >= 1) { p.onArrive && p.onArrive(); p.el.remove(); parts.splice(i, 1); continue; }
+      } else {
+        p.vy += (p.kind === 'paper' ? 560 : 1600) * dt;
+        if (p.kind === 'paper') { p.vx *= 0.985; p.vy = Math.min(p.vy, 170); }
+        p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+        if (p.fade) opacity = Math.max(0, 1 - p.life / p.fade);
+        if (p.kind === 'coin') {
+          const room = cardTop - 14 - p.y; // falling coins stop at the card's top edge
+          if (p.homing) { if (room <= 0) p.flyAt = p.life; }
+          else opacity *= Math.max(0, Math.min(1, room / 20));
+        }
+        if (p.y > H + 40 || opacity <= 0) { p.el.remove(); parts.splice(i, 1); continue; }
+      }
+      const rot = p.kind === 'coin' ? Math.sin(p.rot / 40) * 25 : p.rot;
+      p.el.style.opacity = opacity;
+      p.el.style.transform = `translate(${p.x - 15}px, ${p.y - 19}px) rotate(${rot}deg) scale(${scale})`;
+    }
+  }
+  function burstAt(x, y) { const b = document.createElement('div'); b.className = 'burst'; b.style.left = x + 'px'; b.style.top = y + 'px'; fx.appendChild(b); setTimeout(() => b.remove(), 400); }
+  function popText(text, x, y) { const el = document.createElement('div'); el.className = 'pop'; el.textContent = text; el.style.left = x + 'px'; el.style.top = y + 'px'; fx.appendChild(el); setTimeout(() => el.remove(), 1350); }
+  let toastTimer;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+  function squash() { pinataImg.classList.remove('squash'); void pinataImg.offsetWidth; pinataImg.classList.add('squash'); }
+
+  /* ---------------- Claim ---------------- */
+  let claiming = false;
+  function hit(fromX) {
+    const c = pinataCenter();
+    const dir = fromX == null ? (Math.random() < .5 ? -1 : 1) : (fromX < c.x ? 1 : -1);
+    if (state.pool <= 0) { kick(dir * 0.4); squash(); return; }
+    if (!state.authed) { kick(dir * 0.7); squash(); toast('Войди или зарегистрируйся, чтобы забирать USDT из пиньяты'); return; }
+    if (claiming) { kick(dir * 0.5); squash(); return; }
+    if (state.available < 0.01) {
+      kick(dir * 0.9); squash();
+      for (let i = 0; i < 6; i++) spawn('paper', c.x, c.y, { vx: (Math.random() - .5) * 280, vy: -Math.random() * 260, fade: 1.4 });
+      toast('Пусто 🙃 Сделай ставку — 1.5% от неё можно выбить из ламы');
+      return;
+    }
+    claiming = true;
+    const amount = Math.min(state.available, state.pool);
+    state.available -= amount; state.pool -= amount; state.collected += amount; inFlight += amount;
+    save(); renderStatic();
+    kick(dir * 1.4); squash();
+    burstAt(c.x + (dir < 0 ? 50 : -50), c.y - 10);
+    popText(`+${fmt2(amount)} USDT`, c.x, c.y - 120);
+    pushRecent({ name: 'You', amount, me: true });
+    const n = Math.round(Math.min(30, Math.max(8, 6 + Math.log2(amount + 1) * 3)));
+    const target = collectedTarget();
+    let arrived = 0;
+    for (let i = 0; i < n; i++) {
+      spawn('coin', c.x + (Math.random() - .5) * 50, c.y + (Math.random() - .5) * 40, {
+        vx: (Math.random() - .5) * 600, vy: -280 - Math.random() * 460, homing: true, flyAt: 0.35 + Math.random() * 0.35, target,
+        onArrive: () => {
+          arrived++;
+          inFlight = arrived === n ? 0 : Math.max(0, inFlight - amount / n);
+          collectedTab.classList.remove('pulse'); void collectedTab.offsetWidth; collectedTab.classList.add('pulse');
+          if (arrived === n) {
+            claiming = false; state.balance += amount; save(); renderStatic();
+            const hb = $('hdrBalance'); hb.classList.remove('bump'); void hb.offsetWidth; hb.classList.add('bump');
+          }
+        },
+      });
+    }
+    for (let i = 0; i < 24; i++) spawn('paper', c.x, c.y, { vx: (Math.random() - .5) * 460, vy: -130 - Math.random() * 320, fade: 2.2 });
+    setTimeout(() => toast(`+${fmt2(amount)} USDT · ты выбил ${(amount / POOL_TOTAL * 100).toFixed(4)}% пула`), 900);
+  }
+  pinata.addEventListener('pointerdown', (e) => hit(e.clientX - stageRect().left));
+  $('hitBtn').addEventListener('click', () => hit(null));
+  document.querySelectorAll('.js-signin').forEach((b) => b.addEventListener('click', () => { state.authed = true; save(); renderStatic(); toast('Демо: вход выполнен'); }));
+
+  /* ---------------- Live feed ---------------- */
+  const recent = $('recent');
+  const NAMES = ['kharitonov', 'khaled', 'ueyama', 'py1337', '25kings', 'max_pro', 'kriptoboss', 'dimon', 'luckyKate', 'sasha77', 'whale', 'neo', 'igor', 'mila', 'betking', 'zhenya', 'degen42', 'ivanov', 'Chmonya', 'flugigihayme'];
+  const randName = () => NAMES[(Math.random() * NAMES.length) | 0];
+  const USDT = '<img src="assets/desk/usdt14.svg" alt="">';
+  const RECENT_MAX = 6;
+  function pushRecent({ name, amount, me, instant }) {
+    const li = document.createElement('li');
+    li.className = 'chip' + (me ? ' me' : '');
+    li.innerHTML = `<span class="who">${name}</span><span class="amt">${USDT}<b>${fmt2(amount)}</b></span>`;
+    recent.prepend(li);
+    const extra = [...recent.children].filter((el) => !el.dataset.out).slice(RECENT_MAX);
+    if (instant || reduceMotion || !li.animate) { extra.forEach((el) => el.remove()); return; }
+    const shift = li.offsetHeight + 4;
+    const slide = { duration: 480, easing: 'cubic-bezier(.22,.8,.24,1)' };
+    [...recent.children].forEach((el) => { if (!extra.includes(el)) el.animate([{ transform: `translateY(${-shift}px)` }, { transform: 'none' }], slide); });
+    li.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 480, easing: 'ease-out' });
+    extra.forEach((el) => {
+      el.dataset.out = '1';
+      el.animate([{ opacity: 1, transform: `translateY(${-shift}px)` }, { opacity: 0, transform: `translateY(${-shift}px)` }], { duration: 140, easing: 'ease-out', fill: 'forwards' });
+      setTimeout(() => el.remove(), 150);
+    });
+  }
+  [['Chmonya', 14.12], ['flugigihayme', 14.12], ['ivanov', 14.12], ['kharitonov', 14.12], ['kharitonov', 14.12], ['•••••••••', 14.12]].forEach(([name, amount]) => pushRecent({ name, amount, instant: true }));
+
+  function randomClaim() { const r = Math.random(); return r < .7 ? 0.5 + Math.random() * 25 : r < .95 ? 25 + Math.random() * 150 : 150 + Math.random() * 900; }
+  function otherHit() {
+    if (state.pool > 0) {
+      const amount = Math.min(randomClaim(), state.pool);
+      state.pool -= amount; save(); renderStatic();
+      pushRecent({ name: randName(), amount });
+      kick((Math.random() < .5 ? -1 : 1) * (0.25 + Math.min(0.5, amount / 600)));
+      const c = pinataCenter();
+      for (let i = 0; i < (amount > 100 ? 5 : 2); i++) spawn('coin', c.x, c.y + 20, { vx: (Math.random() - .5) * 220, vy: -80 - Math.random() * 180, fade: 1.2 });
+    }
+    setTimeout(otherHit, 900 + Math.random() * 2200);
+  }
+
+  /* ---------------- Games ---------------- */
+  // Slots follow the Figma frame (rows: Sweet Bonanza, Sugar Rush, Nugget Ridge ×2). Other tabs are demo shuffles of the mobile set.
+  const FIG = { b: 'assets/desk/game-bonanza.png', s: 'assets/desk/game-sugar.png', n: 'assets/desk/game-nugget.png' };
+  const slots = [...'bbbb', ...'ssss', ...'nnnn', ...'nnnn'].map((k) => FIG[k]);
+  const mob = (list) => list.map((n) => `assets/v3/games/g${n}.jpg`);
+  const order = { slots, sports: mob([5, 12, 9, 2, 7, 1, 11, 3, 10, 6, 8, 4, 2, 5, 9, 1]), esports: mob([8, 3, 11, 6, 1, 10, 4, 12, 7, 9, 2, 5, 3, 8, 6, 12]) };
+  const favs = new Set();
+  const grid = $('grid');
+  function renderGames(tab) {
+    grid.innerHTML = order[tab].map((src, i) => `<div class="game"><img src="${src}" alt="" loading="lazy"><button class="fav${favs.has(tab + i) ? ' on' : ''}" data-g="${tab + i}" aria-label="В избранное"><img src="assets/desk/heart.svg" alt=""></button></div>`).join('');
+    $('viewAll').textContent = `View all ${tab} →`;
+    requestAnimationFrame(updateFades);
+  }
+  grid.addEventListener('click', (e) => { const b = e.target.closest('.fav'); if (!b) return; const k = b.dataset.g; favs.has(k) ? favs.delete(k) : favs.add(k); b.classList.toggle('on', favs.has(k)); });
+  $('seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $('seg').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    renderGames(b.dataset.tab);
+  });
+
+  /* ---------------- Scroll areas ---------------- */
+  // Games column: fades show only where there is more to scroll.
+  const gs = $('gamesScroll');
+  function updateFades() {
+    gs.classList.toggle('more-top', gs.scrollTop > 2);
+    gs.classList.toggle('more-bottom', gs.scrollTop + gs.clientHeight < gs.scrollHeight - 2);
+  }
+  gs.addEventListener('scroll', updateFades, { passive: true });
+  addEventListener('resize', updateFades);
+  renderGames('slots');
+  // Sidebar promo jumps to the piñata.
+  document.querySelector('.sb-promo').addEventListener('click', (e) => { e.preventDefault(); scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+
+  /* ---------------- Demo panel ---------------- */
+  document.querySelectorAll('[data-bet]').forEach((b) => b.addEventListener('click', () => {
+    const bet = Number(b.dataset.bet);
+    state.available += bet * RAKEBACK; save(); renderStatic();
+    toast(`Ставка $${bet.toLocaleString('ru-RU')} → +${fmt2(bet * RAKEBACK)} USDT к выбиванию`);
+  }));
+  $('dpStates').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; state.authed = b.dataset.auth === '1'; save(); renderStatic(); });
+  $('resetBtn').addEventListener('click', () => { state = defaults(); inFlight = 0; shown.pool = state.pool; shown.collected = state.collected; save(); renderStatic(); });
+
+  /* ---------------- Main loop ---------------- */
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.033, (now - last) / 1000); last = now;
+    stepPendulum(dt, now / 1000);
+    stepParticles(dt);
+    renderTween(dt);
+    requestAnimationFrame(frame);
+  }
+  renderStatic();
+  requestAnimationFrame(frame);
+  setTimeout(otherHit, 1200);
+})();
+</script>
+</body>
+</html>
